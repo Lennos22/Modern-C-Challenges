@@ -1,3 +1,6 @@
+/* Created by: Nelson Cardona
+ * Completion Date: 3-03-23
+ */
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -25,13 +28,15 @@ void quicksort_dbl(double arr[], int lower, int upper) {
 		printf("upper: %d\n", upper);
 #endif
 		
-		// Base case handling
+		/* Base case handling. Also prevents arr_size
+		 * from being negative!
+		 */
 		if (lower >= upper)
 				return;
 
 		// Establish size of array
 		size_t arr_size = upper - lower + 1;
-		// Establish pivots & left/right indexes
+		// Establish pivots & left/right indices
 		int pivot = lower + arr_size/2;
 		int left_index = lower;
 		int right_index = upper;
@@ -48,22 +53,23 @@ void quicksort_dbl(double arr[], int lower, int upper) {
 
 #ifdef DEBUG
 		printf("Swapped pivot w/ right_index:\n");
-		for (int i = 0; i < arr_size; ++i)
-				printf("arr[%d] = %.3f\t", i, arr[i]);
+		for (size_t i = 0; i < arr_size; ++i)
+				printf("arr[%ld] = %.3f\t", i, arr[i]);
 		printf("\n");
 		printf ("left: %d, right: %d, pivot: %d\n", left_index, right_index, pivot);
 #endif
 
 		// Actual QuickSort Alg
 		for (;;) {
-
 				// Keep moving left index to right until we reach value larger than pivot
 				while (arr[left_index] < arr[pivot]) {
 						++left_index;
 				}
 
-				// Keep moving right index left until we reach value smaller than pivot
-				while (arr[right_index] > arr[pivot]) {
+				/* Keep moving right index left until we reach value smaller than pivot.
+				 * NOTE: right_index is cmped w/ 0 first to prevent seg faults.
+				 */
+				while (right_index >= 0 && arr[right_index] > arr[pivot]) {
 						--right_index;
 				}
 
@@ -82,8 +88,8 @@ void quicksort_dbl(double arr[], int lower, int upper) {
 
 #ifdef DEBUG
 		printf("Sorted partition:\n");
-		for (int i = 0; i < arr_size; ++i)
-				printf("arr[%d] = %.3f\t", i, arr[i]);
+		for (size_t i = 0; i < arr_size; ++i)
+				printf("arr[%ld] = %.3f\t", i, arr[i]);
 		printf("\n");
 		printf ("left: %d, right: %d, pivot: %d\n", left_index, right_index, pivot);
 #endif
@@ -94,11 +100,11 @@ void quicksort_dbl(double arr[], int lower, int upper) {
 }
 
 int main (int argc, char* argv[argc+1]) {
-		int arr_size = argc-1;
+		size_t arr_size = argc-1;
 		double arr[arr_size];
 		
 #ifdef DEBUG
-		printf("There are %d arguments\n", arr_size);
+		printf("There are %ld arguments\n", arr_size);
 #endif
 		for (int i = 1; i < argc; ++i) {
 #ifdef DEBUG
@@ -114,7 +120,7 @@ int main (int argc, char* argv[argc+1]) {
 		quicksort_dbl(arr, 0, arr_size-1);
 
 		printf("Sorted array:\n");
-		for (int i = 1; i < argc; ++i) {
+		for (size_t i = 1; i < argc; ++i) {
 				printf("%.3f\t", arr[i-1]);
 		}
 		printf("\n");
