@@ -52,7 +52,7 @@ void Union(size_t parent[], size_t parent_tree, size_t child_tree) {
 
 void printIndex(size_t parent[], size_t parent_size) {
 		for (size_t i = 0; i < parent_size; ++i) {
-				printf("p[%ld]: %ld", i, parent[i]);
+				printf("p[%zu]: %zu", i, parent[i]);
 				if (i < parent_size)
 						printf(", ");
 		}
@@ -61,7 +61,7 @@ void printIndex(size_t parent[], size_t parent_size) {
 void printRoots(size_t parent[], size_t parent_size) {
 		printf("The root of each element is:\n");
 		for (size_t i = 0; i < parent_size; ++i) {
-				printf("p[%ld]: %ld", i, Find(parent, i));
+				printf("p[%zu]: %zu", i, Find(parent, i));
 				if (i < parent_size)
 						printf(", ");
 		}
