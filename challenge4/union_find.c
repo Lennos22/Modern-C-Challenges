@@ -1,6 +1,9 @@
 /* Created by: Nelson Angelo Magno Cardona
  * Start Time/Date: 15:18/6-03-23
- * Completion Time/Date: 
+ * Completion Time/Date: 17:52/6/03/23
+ * Crummy testing code but it got the job done. I don't know
+ * why you would use SIZE_MAX to label the roots instead of
+ * the root's own value, but whatever, man.
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,40 +50,56 @@ void Union(size_t parent[], size_t parent_tree, size_t child_tree) {
 		FindReplace(parent, child_tree, FindCompress(parent, parent_tree));
 }
 
-int main(int argc, char* argv[argc+1]) {
-#ifdef NOTHING
-		/* Check there is at least one argument */
-		size_t parent_size = atoi(argv[1]);
-		/* Check that parent_size > 0 */
-		if (!parent_size) {
-				printf("Sorry, an array cannot be size 0. Exiting...\n")
-						return EXIT_FAILURE;
+void printIndex(size_t parent[], size_t parent_size) {
+		for (size_t i = 0; i < parent_size; ++i) {
+				printf("p[%ld]: %ld", i, parent[i]);
+				if (i < parent_size)
+						printf(", ");
 		}
-		size_t parent[parent_size] = {0}; // Remember: IGNORE THIS WARNING.
-		
-		init(parent, parent_size);
-#endif
-#define parent_size 20
-		size_t parent[parent_size] = {9, SIZE_MAX, 10, SIZE_MAX, 9, 3, 5, 0, 5, SIZE_MAX, 9, 1, 3, 4, 5, 2, 11, 4, 1, 4};
+}
 
+void printRoots(size_t parent[], size_t parent_size) {
 		printf("The root of each element is:\n");
 		for (size_t i = 0; i < parent_size; ++i) {
 				printf("p[%ld]: %ld", i, Find(parent, i));
 				if (i < parent_size)
 						printf(", ");
 		}
-		printf("\n");
+		printf("\n\n");
+}
 
-		FindReplace(parent, 16, 69);
-		FindReplace(parent, 6, 420);
-		FindReplace(parent, 2, 21);
+int main(int argc, char* argv[argc+1]) {
+		/* Check there is at least one argument */
+		if (argc < 2) {
+				printf("Program must have at least one argument: Length of index set\n");
+				return EXIT_FAILURE;
+		}
+		size_t usr_parent_size = atoi(argv[1]);
+		/* Check that parent_size > 0 */
+		if (!usr_parent_size) {
+				printf("Sorry, an array cannot be size 0. Exiting...\n");
+						return EXIT_FAILURE;
+		}
+		size_t usr_parent[usr_parent_size];
+		init(usr_parent, usr_parent_size);
+
+		printf("The index table for your input is:\n");
+		printIndex(usr_parent, usr_parent_size);
+		printf("\n\n");
+		
+		size_t parent_size = 20;
+		size_t parent[20] = {9, SIZE_MAX, 10, SIZE_MAX, 9, 3, 5, 0, 5, SIZE_MAX, 9, 1, 3, 4, 5, 2, 11, 4, 1, 4};
+		printf("Now using an example forest:\n");
+		printIndex(parent, parent_size);
+		printf("\n\n");
+
+		printRoots(parent, parent_size);
+
+		Union(parent, 2, 19);
+		Union(parent, 2, 6);
 
 		printf("PSYCH!!! The new index table is:\n");
-		for (size_t i = 0; i < parent_size; ++i) {
-				printf("p[%ld]: %ld", i, parent[i]);
-				if (i < parent_size)
-						printf(", ");
-		}
+		printIndex(parent, parent_size);
 		printf("\n");
 
 
