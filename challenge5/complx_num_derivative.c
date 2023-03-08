@@ -23,11 +23,14 @@
 #define DEBUG
 
 /* Make this as small as you need */
-static double const h = 0x1P-24;
+static double const h = 0x1P-32;
+#ifdef DEBUG
+static double const eps = 0x1P-24;
+#endif
 
 /* Put whatever complex differentiable function you want in here! */
 double complex F(double complex z) {
-	return csin(z);
+	return cexp(z);
 }
 
 /* Using two-sided differencing method. I can't really ensure the
@@ -37,6 +40,18 @@ double complex F(double complex z) {
  */
 double complex f(double complex F(double complex), double complex z) {
 	double complex bi_difference = F(z + h) - F(z - h);
+#ifdef DEBUG
+printf("h interval is: %.3e\n", h);
+double complex bi_diff_imag = F(z + I*h) - F(z - I*h);
+double complex cauchy_riemann = bi_difference - bi_diff_imag;
+printf("Cauchy-Riemann check using eps = %.3e\n", eps);
+if (cabs(cauchy_riemann) < 0x1P-24)
+		printf("Function is complex differentiable @ %.3f + I*%.3f\n", creal(z), cimag(z));
+else {
+		printf("Function is not complex differentiable @ %.3f + I*%.3f. Exiting program...\n", creal(z), cimag(z));
+		return EXIT_FAILURE;
+}
+#endif
 	return bi_difference / (2 * h);
 }
 
@@ -55,3 +70,4 @@ printf("Received input: %.5f + I*%.5f\n", creal(input), cimag(input));
 
 	return EXIT_SUCCESS;
 }
+
