@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* For SIZE_MAX */
+#include <stdint.h>
+
 /* For strcasecmp() */
 #include <strings.h>
 /* For strcmp() */
@@ -18,6 +21,9 @@
  * They get swapped, anyway...
  */
 void swp_str(char const* arr[], size_t left, size_t right) {
+#ifdef DEBUG
+printf("Swapping indices: %zu & %zu\n", left, right);
+#endif
 		char const* swap = arr[left];	// Store left for swap
 		arr[left] = arr[right];
 		arr[right] = swap;
@@ -35,16 +41,11 @@ int cmp(char const* s1, char const* s2) {
 #endif
 }
 
-/* NOTE: upper is the upper INDEX. NOT SIZE OF ARRAY!!!
- * Also, the indices were changed to int instead of
- * size_t to allow negative values since it is important
- * to check when left_index >= right_index. Otherwise,
- * right_index may underflow if close to 0 :O
- */
-void quicksort_str(char const* arr[], int lower, int upper) {
+/* NOTE: upper is the upper INDEX. NOT SIZE OF ARRAY!!! */
+void quicksort_str(char const* arr[], size_t lower, size_t upper) {
 #ifdef DEBUG
-		printf("lower: %d\n", lower);
-		printf("upper: %d\n", upper);
+		printf("lower: %zu\n", lower);
+		printf("upper: %zu\n", upper);
 #endif
 		
 		/* Base case handling. Alse prevents arr_size
@@ -56,13 +57,13 @@ void quicksort_str(char const* arr[], int lower, int upper) {
 		// Establish size of array
 		size_t arr_size = upper - lower + 1;
 		// Establish pivots & left/right indices
-		int pivot = lower + arr_size/2;
-		int left_index = lower;
-		int right_index = upper;
+		size_t pivot = lower + arr_size/2;
+		size_t left_index = lower;
+		size_t right_index = upper;
 
 #ifdef DEBUG
-		printf("Therefore, arr_size is: %ld\n", arr_size);
-		printf("Which means pivot is: %d\n", pivot);
+		printf("Therefore, arr_size is: %zu\n", arr_size);
+		printf("Which means pivot is: %zu\n", pivot);
 #endif
 
 		// Push pivot to right side of array
@@ -73,9 +74,9 @@ void quicksort_str(char const* arr[], int lower, int upper) {
 #ifdef DEBUG
 		printf("Swapped pivot w/ right_index:\n");
 		for (size_t i = 0; i < arr_size; ++i)
-				printf("arr[%ld] = %s\t", i, arr[i]);
+				printf("arr[%zu] = %s\t", i, arr[i]);
 		printf("\n");
-		printf ("left: %d, right: %d, pivot: %d\n", left_index, right_index, pivot);
+		printf ("left: %zu, right: %zu, pivot: %zu\n", left_index, right_index, pivot);
 #endif
 
 		// Actual QuickSort Alg
@@ -88,7 +89,7 @@ void quicksort_str(char const* arr[], int lower, int upper) {
 				/* Keep moving right index left until we reach value smaller than pivot.
 				 * NOTE: right_index is cmped w/ 0 to prevent seg faults.
 				 */
-				while (right_index >= 0 && cmp(arr[right_index], arr[pivot]) > 0) {
+				while (right_index > 0 && cmp(arr[right_index], arr[pivot]) > 0) {
 						--right_index;
 				}
 
@@ -108,14 +109,23 @@ void quicksort_str(char const* arr[], int lower, int upper) {
 #ifdef DEBUG
 		printf("Sorted partition:\n");
 		for (size_t i = 0; i < arr_size; ++i)
-				printf("arr[%ld] = %s\t", i, arr[i]);
+				printf("arr[%zu] = %s\t", i, arr[i]);
 		printf("\n");
-		printf ("left: %d, right: %d, pivot: %d\n", left_index, right_index, pivot);
+		printf ("left: %zu, right: %zu, pivot: %zu\n", left_index, right_index, pivot);
 #endif
 
-		// DOUBLE RECURSION, BBY!!!
-		quicksort_str(arr, lower, pivot-1);
-		quicksort_str(arr, pivot+1, upper);
+		/* DOUBLE RECURSION, BBY!!!
+		 * Also, the condionals prevent wraparound since indices are of type
+		 * size_t
+		 */
+		if (pivot == 0)
+				quicksort_str(arr, lower, pivot);
+		else
+				quicksort_str(arr, lower, pivot-1);
+		if (pivot == SIZE_MAX)
+				quicksort_str(arr, pivot, upper);
+		else
+				quicksort_str(arr, pivot+1, upper);
 }
 
 int main (int argc, char* argv[argc+1]) {
@@ -123,7 +133,7 @@ int main (int argc, char* argv[argc+1]) {
 		char const* arr[arr_size];
 		
 #ifdef DEBUG
-		printf("There are %ld arguments\n", arr_size);
+		printf("There are %zu arguments\n", arr_size);
 #endif
 		for (int i = 1; i < argc; ++i) {
 #ifdef DEBUG
