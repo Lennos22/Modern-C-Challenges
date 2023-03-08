@@ -29,7 +29,7 @@ double f(double F(double), double x) {
 }
 
 int main(int argc, char* argv[argc+1]) {
-		if (argc > 2) {
+		if (argc != 2) {
 				printf("This program only takes one double argument.\n");
 				return EXIT_FAILURE;
 		}
