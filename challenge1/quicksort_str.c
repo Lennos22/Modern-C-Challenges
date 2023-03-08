@@ -82,7 +82,7 @@ void quicksort_str(char const* arr[], size_t lower, size_t upper) {
 		// Actual QuickSort Alg
 		for (;;) {
 				// Keep moving left index to right until we reach value larger than pivot
-				while (cmp(arr[left_index], arr[pivot]) < 0) {
+				while (left_index < SIZE_MAX && cmp(arr[left_index], arr[pivot]) < 0) {
 						++left_index;
 				}
 

@@ -63,7 +63,7 @@ void quicksort_dbl(double arr[], size_t lower, size_t upper) {
 		// Actual QuickSort Alg
 		for (;;) {
 				// Keep moving left index to right until we reach value larger than pivot
-				while (arr[left_index] < arr[pivot]) {
+				while (left_index < SIZE_MAX && arr[left_index] < arr[pivot]) {
 						++left_index;
 				}
 
