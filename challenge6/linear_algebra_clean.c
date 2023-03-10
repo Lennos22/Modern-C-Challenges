@@ -14,9 +14,6 @@
 
 #include <tgmath.h>
 
-/* Uncomment to enable DEBUG mode */
-//#define DEBUG
-
 double const eps = 0x1P-16;
 
 void printVector(size_t dim, double const vec[dim]) {
@@ -73,39 +70,16 @@ void copyMatrix(size_t rows, size_t cols, double dest[rows][cols], double const 
 }
 
 void scalarMult(size_t dim, double vec[dim], double scalar) {
-#ifdef DEBUG
-printf("Multiplying %.3f with vector:\n", scalar);
-printVector(dim, vec);
-#endif
 	for (size_t i = 0; i < dim; ++i)
 		vec[i] *= scalar;
-#ifdef DEBUG
-printf("Gives:\n");
-printVector(dim, vec);
-printf("\n");
-#endif
 }
 
 void vectorAdd(size_t dim, double dest[dim], double const src[dim]) {
-#ifdef DEBUG
-printf("Adding vectors:\n");
-printVector(dim, dest);
-printVector(dim, src);
-#endif
 	for (size_t i = 0; i < dim; ++i)
 		dest[i] += src[i];
-#ifdef DEBUG
-printf("Gives:\n");
-printVector(dim, dest);
-printf("\n");
-#endif
 }
 
 void swapRow(size_t dim, double matrix[][dim], size_t r1, size_t r2) {
-#ifdef DEBUG
-printf("Swapping row %zu w/ row %zu\n", r1, r2);
-printf("\n");
-#endif
 	double buf[dim];
 
 	copyVector(dim, buf, matrix[r1]);
@@ -114,30 +88,13 @@ printf("\n");
 }
 
 void rowMult(size_t dim, double matrix[][dim], double scalar, size_t row_dest) {
-#ifdef DEBUG
-printf("Multiplying %.3f into row %zu:\n", scalar, row_dest);
-printVector(dim, matrix[row_dest]);
-#endif
 	for (size_t i = 0; i < dim; ++i)
 		matrix[row_dest][i] *= scalar;
-#ifdef DEBUG
-printf("Row %zu is now:\n", row_dest);
-printVector(dim, matrix[row_dest]);
-printf("\n");
-#endif
 }
 
 void rowAdd(size_t dim, double matrix[][dim], double scalar, size_t row_dest, size_t row_src) {
-#ifdef DEBUG
-printf("Adding row %zu to row %zu using scalar multiple %.3f\n", row_src, row_dest, scalar);
-#endif
 	for (size_t i = 0; i < dim; ++i)
 		matrix[row_dest][i] += scalar*matrix[row_src][i];
-#ifdef DEBUG
-printf("New row is:\n");
-printVector(dim, matrix[row_dest]);
-printf("\n");
-#endif
 }
 
 void rowEchelon(size_t rows, size_t cols, double const matrix[rows][cols]) {
@@ -146,33 +103,16 @@ void rowEchelon(size_t rows, size_t cols, double const matrix[rows][cols]) {
 
 	size_t rank = 0;
 	for (size_t i = 0; i < cols; ++i) {
-#ifdef DEBUG
-printf("Checking column %zu\n", i);
-#endif
 		size_t j = rank;
 		while (fabs(result[j][i]) < eps && j < rows)
 			++j;
-		if (j == rows) {
-#ifdef DEBUG
-printf("Bad column\n");
-#endif
+		if (j == rows)
 			continue;
-		}
-#ifdef DEBUG
-printf("Stopped @ row %zu\n", j);
-#endif
 		//scalarMult(cols, result[j], 1/result[j][i]);
 		swapRow(cols, result, rank, j);
-		for (size_t k = rank + 1; k < rows; ++k) {
-#ifdef DEBUG
-printf("Working on row %zu\n", k);
-#endif
+		for (size_t k = rank + 1; k < rows; ++k)
 			rowAdd(cols, result, -result[k][i]/result[rank][i], k, rank);
-		}
 		++rank;
-#ifdef DEBUG
-printf("Rank is now %zu\n", rank);
-#endif
 	}
 	printf("The row echelon form of matrix is:\n");
 	printMatrix(rows, cols, result);
@@ -184,35 +124,19 @@ void gaussElim(size_t rows, size_t cols, double const matrix[rows][cols]) {
 
 	size_t rank = 0;
 	for (size_t i = 0; i < cols; ++i) {
-#ifdef DEBUG
-printf("Checking column %zu\n", i);
-#endif
 		size_t j = rank;
 		while (fabs(result[j][i]) < eps && j < rows)
 			++j;
-		if (j == rows) {
-#ifdef DEBUG
-printf("Bad column\n");
-#endif
+		if (j == rows)
 			continue;
-		}
-#ifdef DEBUG
-printf("Stopped @ row %zu\n", j);
-#endif
 		swapRow(cols, result, rank, j);
 		rowMult(cols, result, 1/result[rank][i], rank);
 		for (size_t k = 0; k < rows; ++k) {
-#ifdef DEBUG
-printf("Working on row %zu\n", k);
-#endif
 			if (k == rank)
 				continue;
 			rowAdd(cols, result, -result[k][i], k, rank);
 		}
 		++rank;
-#ifdef DEBUG
-printf("Rank is now %zu\n", rank);
-#endif
 	}
 	printf("The REDUCED row echelon form of matrix is:\n");
 	printMatrix(rows, cols, result);
@@ -236,11 +160,6 @@ double minor(size_t dim, double const matrix[dim][dim], size_t row, size_t col) 
 		}
 		++del_row;
 	}
-#ifdef DEBUG
-printf("Deleting row %zu and col %zu gives:\n", row, col);
-printMatrix(dim-1, dim-1, del_matrx);
-printf("\n");
-#endif
 
 	return det(dim-1, del_matrx);
 }
@@ -250,9 +169,6 @@ double det(size_t dim, double const matrix[dim][dim]) {
 	double result = 0;
 	for (size_t i = 0; i < dim; ++i) {
 		result += matrix[0][i] * pow(-1, i) * minor(dim, matrix, 0, i);
-#ifdef DEBUG
-printf("result is currently: %.3f\n", result);
-#endif
 	}
 
 	return result;
@@ -275,38 +191,23 @@ void calcInverse(size_t dim, double dest[dim][dim], double const src[dim][dim]) 
 		}
 	}
 
-#ifdef DEBUG
-printf("Matrix before RREF:\n");
-printMatrix(dim, dim, dest);
-printf("\n");
-#endif
 
 	size_t rank = 0;
 	for (size_t i = 0; i < dim; ++i) {
-#ifdef DEBUG
-printf("Checking column %zu\n", i);
-#endif
 		size_t j = rank;
 		while (fabs(result[j][i]) < eps && j < dim)
 			++j;
 		if (j == dim) {
-#ifdef DEBUG
-printf("Bad column\n");
-#endif
 			continue;
 		}
-#ifdef DEBUG
-printf("Stopped @ row %zu\n", j);
-#endif
+
 		swapRow(dim, result, rank, j);
 		swapRow(dim, dest, rank, j);
+
 		double rank_head = result[rank][i];
 		rowMult(dim, result, 1/rank_head, rank);
 		rowMult(dim, dest, 1/rank_head, rank);
 		for (size_t k = 0; k < dim; ++k) {
-#ifdef DEBUG
-printf("Working on row %zu\n", k);
-#endif
 			if (k == rank)
 				continue;
 			double k_head = result[k][i];
@@ -314,9 +215,6 @@ printf("Working on row %zu\n", k);
 			rowAdd(dim, dest, -k_head, k, rank);
 		}
 		++rank;
-#ifdef DEBUG
-printf("Rank is now %zu\n", rank);
-#endif
 	}
 	printMatrix(dim, dim, dest);
 }
