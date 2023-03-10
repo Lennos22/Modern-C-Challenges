@@ -178,7 +178,7 @@ printf("Rank is now %zu\n", rank);
 	printMatrix(rows, cols, result);
 }
 
-void gaussElim(size_t rows, size_t cols, double const matrix[rows][cols]) {
+void rref(size_t rows, size_t cols, double const matrix[rows][cols]) {
 	double result[rows][cols];
 	copyMatrix(rows, cols, result, matrix);
 
@@ -407,12 +407,12 @@ int main(int argc, char* argv[argc+1]) {
 	printf("Computing REDUCED row echelon form of Matrix:\n");
 	printMatrix(4, 5, testMatrix);
 	printf("\n");
-	gaussElim(4, 5, testMatrix);
+	rref(4, 5, testMatrix);
 	printf("\n");
 	printf("Computing REDUCED row echelon form of Matrix:\n");
 	printMatrix(4, 5, testMatrix);
 	printf("\n");
-	gaussElim(6, 3, testMatrix2);
+	rref(6, 3, testMatrix2);
 	printf("\n");
 
 	double inverse[3][3];
