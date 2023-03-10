@@ -203,6 +203,10 @@ printf("Rank is now %zu\n", rank);
 	printMatrix(rows, cols, result);
 }
 
+void calcInverse(size_t dim, double dest[dim][dim], double const src[dim][dim]) {
+	// Function STUB...
+}
+
 int main(int argc, char* argv[argc+1]) {
 	if (argc < 2) {
 		printf("Program expects at least one input. Exiting...\n");
