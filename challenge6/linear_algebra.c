@@ -21,6 +21,19 @@ void printVector(size_t dim, double const vec[dim]) {
 	printf("}\n");
 }
 
+void printMatrix(size_t rows, size_t cols, double const matrix[rows][cols]) {
+	for (size_t i = 0; i < rows; ++i) {
+		printf("{\t");
+		for (size_t j = 0; j < cols; ++j) {
+			printf("%.3f", matrix[i][j]);
+			if (j < cols - 1)
+				printf(",");
+			printf("\t");
+		}
+		printf("}\n");
+	}
+}
+
 /* If either vector dimensions aren't the same dimension as dim,
  * pray you don't get a seg fault XD
  */
@@ -91,19 +104,30 @@ printf("Swapping row %zu w/ row %zu\n", r1, r2);
 	copyVector(dim, matrix[r2], buf);
 }
 
-void printMatrix(size_t rows, size_t cols, double const matrix[rows][cols]) {
-	for (size_t i = 0; i < rows; ++i) {
-		printf("{\t");
-		for (size_t j = 0; j < cols; ++j) {
-			printf("%.3f", matrix[i][j]);
-			if (j < cols - 1)
-				printf(",\t");
-		}
-		printf("}\n");
-	}
+void rowMult(size_t dim, double matrix[][dim], double scalar, size_t row_dest) {
+#ifdef DEBUG
+printf("Multiplying %.3f into row %zu:\n", scalar, row_dest);
+printVector(dim, matrix[row_dest]);
+printf("\n");
+#endif
+	for (size_t i = 0; i < dim; ++i)
+		matrix[row_dest][i] *= scalar;
+#ifdef DEBUG
+printf("Row %zu is now:\n", row_dest);
+printVector(dim, matrix[row_dest]);
+printf("\n");
+#endif
 }
 
-void gaussElim(size_t rows, size_t cols, double const matrix[rows][cols]) {
+void rowAdd(size_t dim, double matrix[][dim], double scalar, size_t row_dest, size_t row_src) {
+#ifdef DEBUG
+printf("Adding row %zu to row %zu using scalar multiple %.3f\n", row_src, row_dest, scalar);
+#endif
+	for (size_t i = 0; i < dim; ++i)
+		matrix[row_dest][i] += scalar*matrix[row_src][i];
+}
+
+void rowEchelon(size_t rows, size_t cols, double const matrix[rows][cols]) {
 	double result[rows][cols];
 	copyMatrix(rows, cols, result, matrix);
 
@@ -130,10 +154,46 @@ printf("Stopped @ row %zu\n", j);
 #ifdef DEBUG
 printf("Working on row %zu\n", k);
 #endif
-			double buf[cols];
-			copyVector(cols, buf, result[rank]);
-			scalarMult(cols, buf, -result[k][i]/result[rank][i]);
-			vectorAdd(cols, result[k], buf);
+			rowAdd(cols, result, -result[k][i]/result[rank][i], k, rank);
+		}
+		++rank;
+#ifdef DEBUG
+printf("Rank is now %zu\n", rank);
+#endif
+	}
+	printMatrix(rows, cols, result);
+}
+
+void gaussElim(size_t rows, size_t cols, double const matrix[rows][cols]) {
+	double result[rows][cols];
+	copyMatrix(rows, cols, result, matrix);
+
+	size_t rank = 0;
+	for (size_t i = 0; i < cols; ++i) {
+#ifdef DEBUG
+printf("Checking column %zu\n", i);
+#endif
+		size_t j = rank;
+		while (fabs(result[j][i]) < eps && j < rows)
+			++j;
+		if (j == rows) {
+#ifdef DEBUG
+printf("Bad column\n");
+#endif
+			continue;
+		}
+#ifdef DEBUG
+printf("Stopped @ row %zu\n", j);
+#endif
+		swapRow(cols, result, rank, j);
+		rowMult(cols, result, 1/result[rank][i], rank);
+		for (size_t k = 0; k < rows; ++k) {
+#ifdef DEBUG
+printf("Working on row %zu\n", k);
+#endif
+			if (k == rank)
+				continue;
+			rowAdd(cols, result, -result[k][i], k, rank);
 		}
 		++rank;
 #ifdef DEBUG
@@ -214,8 +274,19 @@ int main(int argc, char* argv[argc+1]) {
 		[5] = {1, 0, 3},
 	};
 
+	printf("The row echelon form of matrix 1 is:\n");
+	rowEchelon(4, 5, testMatrix);
+	printf("\n");
+	printf("The row echelon form of matrix 2 is:\n");
+	rowEchelon(6, 3, testMatrix2);
+	printf("\n");
+
+	printf("The REDUCED row echelon form of matrix 1 is:\n");
 	gaussElim(4, 5, testMatrix);
+	printf("\n");
+	printf("The REDUCED row echelon form of matrix 2 is:\n");
 	gaussElim(6, 3, testMatrix2);
+	printf("\n");
 
 	return EXIT_SUCCESS;
 }
