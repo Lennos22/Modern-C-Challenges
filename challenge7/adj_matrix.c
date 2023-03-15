@@ -1,6 +1,6 @@
 /* Created by: Nelson Cardona
  * Start Time/Date: 12:59/15-03-23
- * Completion Time/Date: 
+ * Completion Time/Date: 16:32/15-03-23
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,8 +9,19 @@
 /* For bool and true/false */
 #include <stdbool.h>
 
+/* Copied from Challenge 6 */
+void printVector(size_t dim, size_t const vec[dim]) {
+	printf("{");
+	for (size_t i = 0; i < dim; ++i) {
+		printf("%zu", vec[i]);
+		if (i < dim - 1)
+			printf(", ");
+	}
+	printf("}\n");
+}
+
 /* Do-nothing Breadth-First Search */
-void bfs(size_t nElem, bool graph[nElem][nElem], size_t start) {
+void bfs(size_t nElem, bool const graph[nElem][nElem], size_t start) {
 	bool visited[nElem];
 	size_t queue[nElem];
 
@@ -53,7 +64,7 @@ void bfs(size_t nElem, bool graph[nElem][nElem], size_t start) {
  * only feasible for dfs
  */
 
-void findConnComp(size_t nElem, bool graph[nElem][nElem], size_t node) {
+void findConnComp(size_t nElem, bool const graph[nElem][nElem], size_t node) {
 	bool visited[nElem];
 	size_t queue[nElem];
 
@@ -70,9 +81,9 @@ void findConnComp(size_t nElem, bool graph[nElem][nElem], size_t node) {
 		
 		for (size_t i = 0; i < nElem; ++i) {
 			if (graph[currNode][i] && !visited[i]) {
-					queue[back] = i;
-					++back;
-					visited[i] = true;
+				queue[back] = i;
+				++back;
+				visited[i] = true;
 			}
 		}
 	}
@@ -91,7 +102,7 @@ void findConnComp(size_t nElem, bool graph[nElem][nElem], size_t node) {
 	printf("}\n");
 }
 
-void findSpanTree(size_t nElem, bool graph[nElem][nElem], size_t root, size_t parent[nElem]) {
+void findSpanTree(size_t nElem, bool const graph[nElem][nElem], size_t root, size_t parent[nElem]) {
 	bool visited[nElem];
 	size_t queue[nElem];
 
@@ -115,19 +126,21 @@ void findSpanTree(size_t nElem, bool graph[nElem][nElem], size_t root, size_t pa
 			}
 		}
 	}
+}
 
-	/*if (back == 1) {
-		printf("Node %zu is not connected to any other node on the graph.\n", root);
-		return;
+/* Generates a forest data structure from an adjacency matrix.
+ *
+ * Uses an algorithm that generates the spanning tree of a node in
+ * an acyclical graph. You'll need to initialise the forest object with
+ * all elements as their own root.
+ *
+ * (Again, I still think it would make more sense to roots parents of
+ * themselves, but that's just me...)*/
+void createForest(size_t nElem, bool const graph[nElem][nElem], size_t parent[nElem]) {
+	for (size_t i = 0; i < nElem; ++i) {
+		if (parent[i] == SIZE_MAX)
+			findSpanTree(nElem, graph, i, parent);
 	}
-	
-	printf("The connected components of node %zu are:\n{", root);
-	for (size_t i = 1; i < back; ++i) {
-		printf("%zu", queue[i]);
-		if (i < back - 1)
-			printf(", ");
-	}
-	printf("}\n");*/
 }
 
 int main(int argc, char* argv[argc+1]) {
@@ -144,8 +157,8 @@ int main(int argc, char* argv[argc+1]) {
 		[9] = {0, 0, 0, 0, 0, 1, 1, 0, 0, 0},
 		};
 
-	//printf("Perfoming bfs on first graph:\n");
-	//bfs(10, graph, 1);
+	printf("Perfoming bfs on first graph:\n");
+	bfs(10, graph, 1);
 
 	printf("\nUsing graph 2\n");
 	bool graph2[15][15] = {
@@ -175,11 +188,13 @@ int main(int argc, char* argv[argc+1]) {
 	printf("Finding connected components of 10\n");
 	findConnComp(15, graph2, 10);
 
+	printf("\nConverting graph 2 into a forest:\n");
 	size_t graph2Parent[15] = {0};
 	for (size_t i = 0; i < 15; ++i)
 		graph2Parent[i] = SIZE_MAX;
 
-	findSpanTree(15, graph2, 9, graph2Parent);
+	createForest(15, graph2, graph2Parent);
+	printVector(15, graph2Parent);
 
 	return EXIT_SUCCESS;
 }
