@@ -8,9 +8,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* Uncomment to enable DEBUG mode */
-//#define DEBUG
-
 /* Get unvisited node w/ shortest distance */
 size_t minNodeDist(size_t nElem, size_t dist[nElem], bool visited[nElem]) {
 	size_t node = 0;
@@ -42,25 +39,16 @@ size_t shortestPath(size_t nElem, size_t graph[nElem][nElem], size_t start, size
 		size_t currNode = minNodeDist(nElem, dist, visited);
 		if (dist[currNode] == SIZE_MAX)
 			return SIZE_MAX;	// Every unvisited node is disconnected!!!
-#ifdef DEBUG
-printf("Visiting node %zu\n", currNode);
-#endif
 		
 		for (size_t i = 0; i < nElem; ++i) {
 			if (graph[currNode][i] == SIZE_MAX)
 				continue;
-#ifdef DEBUG
-printf("Node %zu is connected to node %zu!\n", currNode, i);
-#endif
 			size_t currDist = dist[currNode] + graph[currNode][i];
 
 			if (!visited[i] && (currDist < dist[i]))
 				dist[i] = currDist;
 		}
 		visited[currNode] = true;
-#ifdef DEBUG
-printf("Finsihed visiting %zu. Current min dist is %zu\n", currNode, dist[end]);
-#endif
 	}
 
 	return dist[end];
