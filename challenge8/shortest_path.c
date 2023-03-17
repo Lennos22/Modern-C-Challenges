@@ -13,8 +13,17 @@
 
 /* Get unvisited node w/ shortest distance */
 size_t minDist(size_t nElem, size_t dist[nElem], bool visited[nElem]) {
-	// STUB...
-	return 0;
+	size_t node = 0;
+
+	while (visited[node])
+		++node;
+
+	for (size_t i = node + 1; i < nElem; ++i) {
+		if (!visited[i] && dist[i] < dist[node])
+			node = i;
+	}
+
+	return node;
 }
 
 /* Computes the shortest path between two nodes */
