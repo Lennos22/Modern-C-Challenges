@@ -27,8 +27,6 @@ size_t minNodeDist(size_t nElem, size_t dist[nElem], bool visited[nElem]) {
 size_t shortestPath(size_t nElem, size_t graph[nElem][nElem], size_t start, size_t end) {
 	bool visited[nElem];	// This will be processed slightly differently from bfs
 	size_t dist[nElem];		// Tentative minimum distances from start to every other node
-	size_t queue[nElem];
-	queue[0] = start;
 
 	for (size_t i = 0; i < nElem; ++i) {
 		visited[i] = 0;
