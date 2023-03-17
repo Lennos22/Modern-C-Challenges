@@ -55,7 +55,7 @@ size_t shortestPath(size_t nElem, size_t graph[nElem][nElem], size_t start, size
 int main(int argc, char* argv[argc+1]) {
 	if (argc < 3) {
 		printf("Arguments for this program are:\n");
-		printf("Start node and end node (between 0-14, inc.)\n");
+		printf("Start node and end node (between 0-15, inc.)\n");
 		return EXIT_FAILURE;
 	}
 	size_t distGraph[16][16] = {
@@ -87,6 +87,10 @@ int main(int argc, char* argv[argc+1]) {
 
 	size_t start = strtoull(argv[1], 0, 10);
 	size_t end = strtoull(argv[2], 0, 10);
+	if (start > 15 || end > 15) {
+		printf("Start and end nodes must be within range (0-15, inc.)\n");
+		return EXIT_FAILURE;
+	}
 
 	size_t minDist = shortestPath(16, distGraph, start, end);
 	if (minDist == SIZE_MAX)
