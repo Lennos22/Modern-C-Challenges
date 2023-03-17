@@ -135,7 +135,8 @@ void findSpanTree(size_t nElem, bool const graph[nElem][nElem], size_t root, siz
  * all elements as their own root.
  *
  * (Again, I still think it would make more sense to roots parents of
- * themselves, but that's just me...)*/
+ * themselves, but that's just me...)
+ */
 void createForest(size_t nElem, bool const graph[nElem][nElem], size_t parent[nElem]) {
 	for (size_t i = 0; i < nElem; ++i) {
 		if (parent[i] == SIZE_MAX)
@@ -149,8 +150,8 @@ int main(int argc, char* argv[argc+1]) {
 		[1] = {0, 0, 1, 0, 1, 0, 0, 1, 0, 0},
 		[2] = {0, 1, 0, 0, 1, 0, 0, 0, 0, 0},
 		[3] = {0, 0, 0, 0, 0, 1, 1, 0, 0, 0},
-		[4] = {0, 1, 1, 0, 0, 0, 0, 1, 0, 0},
-		[5] = {0, 0, 0, 1, 0, 0, 0, 1, 1, 1}, // Using ints here for CLARITY
+		[4] = {0, 1, 1, 0, 0, 0, 0, 1, 0, 0},	// Using ints here for CLARITY
+		[5] = {0, 0, 0, 1, 0, 0, 0, 1, 1, 1},	// Notice how matrix is symmetric
 		[6] = {0, 0, 0, 1, 0, 0, 0, 1, 0, 1},
 		[7] = {1, 1, 0, 0, 1, 1, 1, 0, 0, 0},
 		[8] = {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
@@ -198,3 +199,4 @@ int main(int argc, char* argv[argc+1]) {
 
 	return EXIT_SUCCESS;
 }
+
