@@ -3,10 +3,12 @@
  * on how far apart the prime factors are from each other or how large the
  * prime factors get. Larger prime factors take longer to find!
  *
- * This is a modified algorithm that process all the even prime factors
+ * This is a modified algorithm that processes all the even prime factors
  * (i.e. 2) before the rest, which will be odd. Should halve the
  * processing time, but it could still get messy for very large prime
  * factors - or even worse, LARGE PRIMES.
+ * 
+ * You just can't beat NP time :(
  */
 #include <stdlib.h>
 #include <stdio.h>

@@ -2,22 +2,27 @@
  * Start Time/Date: 14:50/20-03-2023
  * Completion Time/Date: 15:29/20-03-2023
  * 
- * I was honestly quite surprised that the algorithm works for unbelievable
+ * I was honestly quite surprised that the algorithm works for unbelievably
  * large values such as SIZE_MAX since I was using sqrt(), which converts
  * the input into a double.
+ *
  * I did some more testing and it I realised that SIZE_MAX STILL loses
- * precision when converted to double, but the square root is still close
- * enough to the real square root that the algorithm can still compute the
- * prime factors. However, I got lucky in this case since the largest prime
- * factors were nowhere near the sqrt() to be affected. But I can't say the
- * same for other very large numbers. Therefore, I must declare the behaviour
- * of this algoritm as UB when using sqrt().
+ * precision when converted to double, but the smallest prime factors
+ * tended to be too small to be anywhere near sqrt(n). This is only a
+ * problem if there was somehow a prime factor VERY CLOSE to sqrt(n) and
+ * the imprecision forces the algorithm to miss it and return n, instead,
+ * thinking n is prime. I don't know if it's possible for a prime factor
+ * to be close enough to sqrt(n) for floating point imprecision to create
+ * an error, but I will err on the side of caution and conclude that
+ * floating point imprecision leads to UB in this algorithm (for very large
+ * values).
  *
  * Unfortunately, if I used something like n/2 instead of sqrt(n), then the
  * runtime of the algorithm becomes painfully long for very large values.
  * Or, for certain value, because I tested SIZE_MAX and SIZE_MAX-1 and I
  * got answers INSTANTLY, whereas an arbitray value like SIZE_MAX-29384
  * took too damn long. Also, n/2 isn't larger than sqrt(n) for smaller vals.
+ *
  * I honestly have no idea, anymore :(
  */
 #include <stdlib.h>
@@ -27,7 +32,7 @@
 
 /* Computes the smallest prime factor of n */
 size_t minPrimeFactor(size_t n) {
-	for (size_t i = 2; i <= n/2; ++i) {
+	for (size_t i = 2; i <= sqrt(n); ++i) {
 		if (!(n % i))
 			return i;
 	}
