@@ -1,0 +1,2 @@
+Try MergeSort this array w/o the "right_index >= 0" operation:
+18 29 3.141596 29 10.39 -0x1P-1 199 420 69 109837
