@@ -29,7 +29,7 @@
 enum {	BI_RGB = 0, BI_RLE8 = 1, BI_RLE4 = 2, BITFIELDS = 3, 	};
 
 /* Information on .bmp/.dib compression values was found here:
- * http://www.ece.ualberta.ca/~elliott/ee552/studentAppNotes/2003_w/misc/bmp_file_format/bmp_file_format.htm
+ * https://www.fileformat.info/format/bmp/egff.htm
  */
 static char const*const comprsn_type[] = {
 	[BI_RGB] = "no compression",
