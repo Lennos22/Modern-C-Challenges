@@ -127,7 +127,7 @@ printf("DIB_size: %" PRIi32 "\n", DIB_size);
 	printf("compression: %s\n", comprsn_type[compression]);
 
 assert(!(DIBct_len - DIB_size));								// I honestly do not have the capacity to
-assert(compression == BI_RGB);					// deal with either of these, atm
+assert(compression == BI_RGB);									// deal with either of these, atm
 
 	/* Ensures that output file is 24bit RGB */
 	if (bitDepth != GRAY_BITDEPTH) {
@@ -137,8 +137,6 @@ assert(compression == BI_RGB);					// deal with either of these, atm
 printf("New bitDepth has been set to: %" PRIu16 "\n", *(uint16_t*)&DIBct[BITDEPTH-BMP_HEADER_SIZE]);
 #endif
 	}
-
-assert(*(uint16_t*)&DIBct[BITDEPTH-BMP_HEADER_SIZE] == GRAY_BITDEPTH);
 
 	fwrite(DIBct, sizeof(uint8_t), DIBct_len, fOut);
 
@@ -151,7 +149,7 @@ assert(*(uint16_t*)&DIBct[BITDEPTH-BMP_HEADER_SIZE] == GRAY_BITDEPTH);
 	size_t green = px_size - 2;
 	size_t blue = px_size - 1;
 	/* Rows must be padded at the end to ensure their length is a multiple of 4 bytes */
-	size_t padding = (4 - ((px_size*width)%4)) % 4;						// Number of bytes to pad img row
+	size_t padding = (4 - ((px_size*width)%4)) % 4;				// Number of bytes to pad img row
 
 #ifndef NDEBUG
 printf("Indices are: red = %zu, green = %zu, blue = %zu\n", red, green, blue);
@@ -186,8 +184,6 @@ assert(!((padding + px_size*width) % 4));
 				errno = 0;
 				return EXIT_FAILURE;
 			}
-			for (size_t z = 0; z < padding; ++z)
-				pad_buf[z] = 0;
 			fwrite(pad_buf, sizeof(uint8_t), padding, fOut);
 		}
 	}
@@ -195,7 +191,7 @@ assert(!((padding + px_size*width) % 4));
 	fclose(fOut);
 	fclose(fIn);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int main(int argc, char* argv[argc+1]) {
