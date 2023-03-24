@@ -1,12 +1,10 @@
-/**
-* @file image_rgbtogray.c
-* @brief C program to convert an RGB image to grayscale.
-* @author Priya Shah
-* @version v1
-* @date 2018-01-10
-*/
+/* Adapted from Priya Shah's code: https://github.com/abhijitnathwani/image-processing
+ * Created: 24-03-23/16:50
+ */
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
+#include <inttypes.h>
 
 int main()
 {
@@ -31,6 +29,11 @@ int main()
 	}
 
 	fwrite(byte,sizeof(unsigned char),54,fOut);					//write the header back
+
+	// inspect DIB header size
+	uint32_t DIBsize = *(uint32_t*)&byte[0xEU];
+
+	printf("DIBsize = %" PRIu32 "\n", DIBsize); 
 
 	// extract image height, width and bitDepth from imageHeader 
 	int height = *(int*)&byte[18];
