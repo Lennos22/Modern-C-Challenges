@@ -180,7 +180,7 @@ int main(int argc, char* argv[argc+1]) {
 			list[i] = strtod(buf, 0);
 		}
 		fclose(instream);
-		printf("Applying merge sort to data...\n");
+		printf("Applying quick sort to data...\n");
 		/*
 		 * BEGIN TIMING HERE!!!
 		 */
@@ -192,7 +192,7 @@ int main(int argc, char* argv[argc+1]) {
 		 */
 		struct timespec ts_end;
 		timespec_get(&ts_end, TIME_UTC);
-		printf("Merge sort complete! Time elapsed: ");
+		printf("Quick sort complete! Time elapsed: ");
 		print_timespec(timespec_diff(ts_end, ts_begin));
 		printf("\n");
 		FILE* outstream = fopen(argv[3], "w");
