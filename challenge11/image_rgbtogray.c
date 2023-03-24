@@ -26,6 +26,17 @@
 #define BMP_HEADER_SIZE			0x0EU
 #define GRAY_BITDEPTH			0x18U
 
+enum {	BI_RGB = 0, BI_RLE8 = 1, BI_RLE4 = 2, BITFIELDS = 3, 	};
+
+/* Information on .bmp/.dib compression values was found here:
+ * http://www.ece.ualberta.ca/~elliott/ee552/studentAppNotes/2003_w/misc/bmp_file_format/bmp_file_format.htm
+ */
+static char const*const comprsn_type[] = {
+	[BI_RGB] = "no compression",
+	[BI_RLE8] = "8bit RLE encoding",
+	[BI_RLE4] = "4bit RLE encoding",
+	[BITFIELDS] = "bitfields encoding",
+};
 static char const bmp_str[] = ".bmp";
 static char const new_extension[] = "_gray";
 
@@ -113,19 +124,20 @@ printf("DIB_size: %" PRIi32 "\n", DIB_size);
 	printf("width: %d\n",width);
 	printf("height: %d\n",height );
 	printf("bitDepth (Bits Per Pixel): %" PRIu16 "\n", bitDepth);
-	printf("compression: %" PRIu32 "\n", compression);
+	printf("compression: %s\n", comprsn_type[compression]);
 
-assert(!(DIBct_len - DIB_size));			// May God have mercy on your souls
+assert(!(DIBct_len - DIB_size));								// I honestly do not have the capacity to
+assert(compression == BI_RGB);					// deal with either of these, atm
 
 	/* Ensures that output file is 24bit RGB */
 	if (bitDepth != GRAY_BITDEPTH) {
 		DIBct[BITDEPTH-BMP_HEADER_SIZE+1] = 0;							// It's Little Endian
 		DIBct[BITDEPTH-BMP_HEADER_SIZE] = (uint8_t) GRAY_BITDEPTH;		// Trust me, bro...
-	}
-
 #ifndef NDEBUG
 printf("New bitDepth has been set to: %" PRIu16 "\n", *(uint16_t*)&DIBct[BITDEPTH-BMP_HEADER_SIZE]);
 #endif
+	}
+
 assert(*(uint16_t*)&DIBct[BITDEPTH-BMP_HEADER_SIZE] == GRAY_BITDEPTH);
 
 	fwrite(DIBct, sizeof(uint8_t), DIBct_len, fOut);
@@ -138,10 +150,15 @@ assert(*(uint16_t*)&DIBct[BITDEPTH-BMP_HEADER_SIZE] == GRAY_BITDEPTH);
 	size_t red = px_size - 3;
 	size_t green = px_size - 2;
 	size_t blue = px_size - 1;
+	/* Rows must be padded at the end to ensure their length is a multiple of 4 bytes */
+	size_t padding = (4 - ((px_size*width)%4)) % 4;						// Number of bytes to pad img row
 
 #ifndef NDEBUG
 printf("Indices are: red = %zu, green = %zu, blue = %zu\n", red, green, blue);
+printf("Padding is %zu bytes\n", padding);
 #endif
+
+assert(!((padding + px_size*width) % 4));
 			
 	for(i=0;i<size;i++)											//RGB to gray
 	{
@@ -159,6 +176,20 @@ printf("Indices are: red = %zu, green = %zu, blue = %zu\n", red, green, blue);
 		putc(y,fOut);
 		putc(y,fOut);
 		putc(y,fOut);
+
+		/* Padding the rows */
+		if (!((i+1) % width)) {
+			uint8_t pad_buf[padding];
+			if (fread(pad_buf, sizeof(uint8_t), padding, fIn) < padding) {
+				fprintf(stderr, "Padding is too large...\n");
+				perror(0);
+				errno = 0;
+				return EXIT_FAILURE;
+			}
+			for (size_t z = 0; z < padding; ++z)
+				pad_buf[z] = 0;
+			fwrite(pad_buf, sizeof(uint8_t), padding, fOut);
+		}
 	}
 	
 	fclose(fOut);
