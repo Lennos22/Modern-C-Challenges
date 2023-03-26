@@ -15,7 +15,7 @@
  */
 /* For strcasestr() */
 #define _GNU_SOURCE
-#define NDEBUG
+//#define NDEBUG
 
 #include <tgmath.h>
 #include <string.h>
@@ -89,7 +89,11 @@ static char const*const header_type_str[] = {
 static char const bmp_str[] = ".bmp";
 static char const gray_ext_str[] = "_gray";
 static char const avg_ext_str[] = "_avg";
-static int const merge_threshold = 35;
+
+/* I consider 15-25 to be the sweet-stop b/w detail identification and form identification.
+ * It also creates a really nice effect!
+ */
+static int const merge_threshold = 25;
 
 /* Adapted from image_rgbtpgray.c in Priya Shah's repo: https://github.com/abhijitnathwani/image-processing
  */
@@ -110,19 +114,11 @@ assert(img_name);
 	unsigned char file_header[FILE_HEADER_SIZE];
 	ptrdiff_t img_name_len = strcasestr(img_name, bmp_str) - img_name;	// Length of img_name w/o extension
 
-#ifndef NDEBUG
-printf("Length of image file name w/o extension is: %td\n", img_name_len);
-#endif
-
 	char out_name[img_name_len+strlen(gray_ext_str)+strlen(bmp_str)+1];
 	strncpy(out_name, img_name, img_name_len);				// Copy name w/o ".bmp" extension
 	out_name[img_name_len] = '\0';
 	strcat(out_name, gray_ext_str);
 	strcat(out_name, bmp_str);
-
-#ifndef NDEBUG
-printf("Output file name will be: %s\n", out_name);
-#endif
 
 	FILE *fOut = fopen(out_name,"w+");		    		//Output File name
 
@@ -148,16 +144,11 @@ printf("Output file name will be: %s\n", out_name);
 
 	// Inspect Data Offset
 	uint32_t DataOffset = *(uint32_t*)&file_header[DATA_OFFSET];
-	size_t DIBct_len = DataOffset - FILE_HEADER_SIZE;
+	size_t bmp_header_len = DataOffset - FILE_HEADER_SIZE;
 
-#ifndef NDEBUG
-printf("DataOffset: %" PRIu16 "\n", DataOffset);
-printf("So, length of DIB + Color Table is: %zu\n", DIBct_len);
-#endif
+	uint8_t bmp_header[bmp_header_len];				// Grabs the bmp header (and color table, if applicable)
 
-	uint8_t DIBct[DIBct_len];
-
-	if (fread(DIBct, sizeof(uint8_t), DIBct_len, fIn) < DIBct_len) {
+	if (fread(bmp_header, sizeof(uint8_t), bmp_header_len, fIn) < bmp_header_len) {
 		fprintf(stderr, "Not enough bytes were read from DIB and Color Table...\n");
 		perror(0);
 		errno = 0;
@@ -167,37 +158,31 @@ printf("So, length of DIB + Color Table is: %zu\n", DIBct_len);
 	}
 
 	// Inspect DIB size
-	uint32_t DIB_size = *(uint32_t*)&DIBct[DIB_SIZE-FILE_HEADER_SIZE];
-#ifndef NDEBUG
-printf("DIB_size: %" PRIu32 "\n", DIB_size);
+	uint32_t DIB_size = *(uint32_t*)&bmp_header[DIB_SIZE-FILE_HEADER_SIZE];
 assert(header_type_str[DIB_size]);
-#endif
 	printf("DIB header type is: %s\n", header_type_str[DIB_size]);
 
 	// extract image height, width and bitDepth from imageHeader (+ Compression Type)
-	int height = *(int*)&DIBct[HEIGHT-FILE_HEADER_SIZE];
-	int width = *(int*)&DIBct[WIDTH-FILE_HEADER_SIZE];
-	uint16_t bitDepth = *(uint16_t*)&DIBct[BITDEPTH-FILE_HEADER_SIZE];
-	uint32_t compression = *(uint32_t*)&DIBct[COMPRESSION-FILE_HEADER_SIZE];
+	int height = *(int*)&bmp_header[HEIGHT-FILE_HEADER_SIZE];
+	int width = *(int*)&bmp_header[WIDTH-FILE_HEADER_SIZE];
+	uint16_t bitDepth = *(uint16_t*)&bmp_header[BITDEPTH-FILE_HEADER_SIZE];
+	uint32_t compression = *(uint32_t*)&bmp_header[COMPRESSION-FILE_HEADER_SIZE];
 
 	printf("width: %d\n",width);
 	printf("height: %d\n",height );
 	printf("bitDepth (Bits Per Pixel): %" PRIu16 "\n", bitDepth);
 	printf("compression: %s\n", comprsn_type[compression]);
 
-assert(!(DIBct_len - DIB_size));								// I honestly do not have the capacity to
+assert(!(bmp_header_len - DIB_size));								// I honestly do not have the capacity to
 assert(compression == BI_RGB);									// deal with either of these, atm
 
 	/* Ensures that output file is 24bit RGB */
 	if (bitDepth != GRAY_BITDEPTH) {
-		DIBct[BITDEPTH-FILE_HEADER_SIZE+1] = 0;							// It's Little Endian
-		DIBct[BITDEPTH-FILE_HEADER_SIZE] = (uint8_t) GRAY_BITDEPTH;		// Trust me, bro...
-#ifndef NDEBUG
-printf("New bitDepth has been set to: %" PRIu16 "\n", *(uint16_t*)&DIBct[BITDEPTH-FILE_HEADER_SIZE]);
-#endif
+		bmp_header[BITDEPTH-FILE_HEADER_SIZE+1] = 0;							// It's Little Endian
+		bmp_header[BITDEPTH-FILE_HEADER_SIZE] = (uint8_t) GRAY_BITDEPTH;		// Trust me, bro...
 	}
 
-	fwrite(DIBct, sizeof(uint8_t), DIBct_len, fOut);
+	fwrite(bmp_header, sizeof(uint8_t), bmp_header_len, fOut);
 
 	int size = height*width;									//calculate image size
 
@@ -213,18 +198,13 @@ printf("New bitDepth has been set to: %" PRIu16 "\n", *(uint16_t*)&DIBct[BITDEPT
 	img_dim[1] = height;
 
 	size_t px_size = bitDepth < 8 ? 1 : bitDepth / 8;
-	unsigned char buffer[size][px_size];						//to store the image data
+	unsigned char buffer[px_size];						//to store the image data
 	
 	size_t red = px_size - 3;
 	size_t green = px_size - 2;
 	size_t blue = px_size - 1;
 	/* Rows must be padded at the end to ensure their length is a multiple of 4 bytes */
 	size_t padding = (4 - ((px_size*width)%4)) % 4;				// Number of bytes to pad img row
-
-#ifndef NDEBUG
-printf("Indices are: red = %zu, green = %zu, blue = %zu\n", red, green, blue);
-printf("Padding is %zu bytes\n", padding);
-#endif
 
 assert(!((padding + px_size*width) % 4));
 			
@@ -238,9 +218,9 @@ assert(!((padding + px_size*width) % 4));
 
 		/* NOTE: From MSB->LSB, we have - blue, green, red, alpha */
 		for (j = px_size-1; j >= 0 ; --j)
-			buffer[i][j] = getc(fIn);
+			buffer[j] = getc(fIn);
 			
-		y=(buffer[i][red]*0.3) + (buffer[i][green]*0.59)	+ (buffer[i][blue]*0.11);			//conversion formula of rgb to gray
+		y=(buffer[red]*0.3) + (buffer[green]*0.59)	+ (buffer[blue]*0.11);			//conversion formula of rgb to gray
 		px_buf[i] = y;
 
 		putc(y,fOut);
@@ -271,10 +251,6 @@ assert(!((padding + px_size*width) % 4));
 void calcStatistic(PixelRegion segments[], size_t dest_root, size_t src_root) {
 	segments[dest_root].nPixels += segments[src_root].nPixels;
 	segments[dest_root].sum += segments[src_root].sum;
-#ifndef NDEBUG
-printf("Merged segments of root pixels %zu and %zu, new statistic is:\n", dest_root, src_root);
-printf("root = %zu, nPixels = %zu, sum = %zu\n", dest_root, segments[dest_root].nPixels, segments[dest_root].sum); 
-#endif
 }
 
 bool canMerge(size_t parent[], size_t elem1, size_t elem2, PixelRegion segments[], size_t merge_threshold) {
@@ -297,8 +273,8 @@ void mergeSegments(size_t parent[], size_t dest, size_t src, PixelRegion segment
 bool passThrough(size_t nElem, size_t parent[nElem], PixelRegion segments[nElem], int img_dim[static 2], size_t merge_threshold) {
 	bool hasMerged = false;
 
-	for (size_t i = 1; i < nElem; ++i) {
-		if (canMerge(parent, i-1, i, segments, merge_threshold)) {
+	for (size_t i = 0; i < nElem; ++i) {
+		if ((i % img_dim[0]) && canMerge(parent, i-1, i, segments, merge_threshold)) {
 			mergeSegments(parent, i-1, i, segments);
 			hasMerged = true;
 		}
@@ -361,7 +337,6 @@ void generateAvgImg(char const* img_name, size_t nElem, size_t parent[nElem], Pi
 	FILE* outstream = fopen(out_name, "w");
 
 	assert((FILE_HEADER_SIZE + bmp_header_size) == DataOffset);
-	assert(*(uint32_t*)&bmp_header[DIB_SIZE - FILE_HEADER_SIZE] == DIB_size);
 
 	fwrite(file_header, sizeof(unsigned char), FILE_HEADER_SIZE, outstream);
 	fwrite(bmp_header, sizeof(unsigned char), bmp_header_size, outstream);
@@ -378,10 +353,6 @@ size_t image_size = width*height;
 
 	for (size_t i = 0; i < nElem; ++i) {
 		unsigned char pixel_data = getSegmentAvg(parent, i, segments);
-
-#ifndef NDEBUG
-printf("New value of pixel %zu is: %u\n", i, pixel_data);
-#endif
 
 		putc(pixel_data,outstream);
 		putc(pixel_data,outstream);
