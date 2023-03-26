@@ -264,7 +264,8 @@ bool canMerge(size_t parent[], size_t elem1, size_t elem2, PixelRegion segments[
 	return fabs(reg1_mean - reg2_mean) <= merge_threshold;
 }
 
-void mergeSegments(size_t parent[], size_t dest, size_t src, PixelRegion segments[]) { assert(Find(parent, dest) != Find(parent, src));
+void mergeSegments(size_t parent[], size_t dest, size_t src, PixelRegion segments[]) {
+assert(Find(parent, dest) != Find(parent, src));
 	size_t old_root = Find(parent, src);
 	Union(parent, dest, src);
 	calcStatistic(segments, Find(parent, dest), old_root);
@@ -291,7 +292,7 @@ unsigned char getSegmentAvg(size_t parent[], size_t pixel, PixelRegion segments[
 	size_t root = Find(parent, pixel);
 	double avg = ((double) segments[root].sum) / ((double) segments[root].nPixels);
 
-	assert((unsigned char) avg <= UCHAR_MAX);
+assert((unsigned char) avg <= UCHAR_MAX);
 
 	return (unsigned char) avg;
 }
@@ -332,11 +333,10 @@ void generateAvgImg(char const* img_name, size_t nElem, size_t parent[nElem], Pi
 	strcat(out_name, thresh_str);
 	strcat(out_name, bmp_str);
 
-
 	printf("Drawing grayscale AVERAGE into file: \"%s\"\n", out_name);
 	FILE* outstream = fopen(out_name, "w");
 
-	assert((FILE_HEADER_SIZE + bmp_header_size) == DataOffset);
+assert((FILE_HEADER_SIZE + bmp_header_size) == DataOffset);
 
 	fwrite(file_header, sizeof(unsigned char), FILE_HEADER_SIZE, outstream);
 	fwrite(bmp_header, sizeof(unsigned char), bmp_header_size, outstream);
@@ -348,8 +348,8 @@ size_t image_size = width*height;
 	size_t px_size = GRAY_BITDEPTH/8;
 	size_t padding = (4 - ((px_size*width)%4)) % 4;				// Number of bytes to pad img row
 
-	assert(nElem == image_size);
-	assert(!((px_size*width + padding) % 4));
+assert(nElem == image_size);
+assert(!((px_size*width + padding) % 4));
 
 	for (size_t i = 0; i < nElem; ++i) {
 		unsigned char pixel_data = getSegmentAvg(parent, i, segments);
