@@ -1,21 +1,21 @@
-/* Created by: Nelson Cardona
- * Date/Time: 24-03-23/16:50
- * 
- * It turns out, Windows' Win32 API ALREADY contains functionality for processing and developing
- * graphics and formatted text called the Microsoft Windows graphics device interface (GDI):
- * 
- * https://learn.microsoft.com/en-us/windows/win32/api/_gdi/
- *
- * This also includes bitmaps, and most of this functionality for bitmaps is contained in the
- * wingdi.h header. The information of which can be found here:
- *
- * https://learn.microsoft.com/en-us/windows/win32/api/wingdi/
- *
- * A lot of the identifiers you see in this code have come about from studying this API.
- */
-/* For strcasestr() */
+	/* Created by: Nelson Cardona
+	 * Date/Time: 24-03-23/16:50
+	 * 
+	 * It turns out, Windows' Win32 API ALREADY contains functionality for processing and developing
+	 * graphics and formatted text called the Microsoft Windows graphics device interface (GDI):
+	 * 
+	 * https://learn.microsoft.com/en-us/windows/win32/api/_gdi/
+	 *
+	 * This also includes bitmaps, and most of this functionality for bitmaps is contained in the
+	 * wingdi.h header. The information of which can be found here:
+	 *
+	 * https://learn.microsoft.com/en-us/windows/win32/api/wingdi/
+	 *
+	 * A lot of the identifiers you see in this code have come about from studying this API.
+	 */
+	/* For strcasestr() */
 #define _GNU_SOURCE
-//#define NDEBUG
+	//#define NDEBUG
 
 #include <tgmath.h>
 #include <string.h>
@@ -33,7 +33,7 @@
 #include <limits.h>
 #endif
 
-/* .bmp/.dip value offsets */
+	/* .bmp/.dip value offsets */
 #define FILE_SIZE				0x02U
 #define DATA_OFFSET				0x0AU
 #define DIB_SIZE				0x0EU
@@ -41,6 +41,7 @@
 #define HEIGHT					0x16U
 #define BITDEPTH				0x1CU
 #define COMPRESSION				0x1EU
+#define IMAGE_SIZE				0x22U
 
 #define FILE_HEADER_SIZE		0x0EU
 #define GRAY_BITDEPTH			0x18U
@@ -95,7 +96,29 @@ static char const avg_ext_str[] = "_avg";
  */
 static int const merge_threshold = 25;
 
-/* Adapted from image_rgbtpgray.c in Priya Shah's repo: https://github.com/abhijitnathwani/image-processing
+/* Adapted from image_rgbtpgray.c in Priya Shah's repo:
+ *
+ * https://github.com/abhijitnathwani/image-processing
+ * 
+ * I don't know what else to say, apart from: "This guy's code SUCKS BALLS!!!". I mean,
+ * seriously, why would you use int to grab a DWORD value? Also, you clearly didn't do much
+ * research on bitmaps and DIBs. You can't just assume the file header + bmp header is 54
+ * bytes. That's assuming the bmp header is a BITMAPINFORHEADER. If it were another type of
+ * header, your code is screwed and exhibits UB behaviour. You also assume that, somehow,
+ * the bitdepth will be 24bit and that there would be no compression. At least I have error
+ * messages or assertions for these unwanted properties. At this point, I pretty much redid
+ * ALL OF YOUR CODE. I may as well have just written this thing from scratch XD.
+ *
+ * But, hey. I guess you can pat yourself on the back, cuz you know how to do a simple Google
+ * search. *Round of applause*. I wouldn't be surprised if you're currently (as of typing
+ * this essay) trying to exploit ChatGPT to write complex code for you. Good luck with that,
+ * BTW!!!
+ *
+ * May your code always generate seg faults and your memory be plagued with constant cache
+ * misses.
+ *
+ * Kind regards,
+ * Nelson Cardona
  */
 int rgb_to_gray(char const* img_name, size_t buf_len, unsigned char px_buf[buf_len], int img_dim[static 2])
 {
@@ -115,7 +138,7 @@ assert(img_name);
 	ptrdiff_t img_name_len = strcasestr(img_name, bmp_str) - img_name;	// Length of img_name w/o extension
 
 	char out_name[img_name_len+strlen(gray_ext_str)+strlen(bmp_str)+1];
-	strncpy(out_name, img_name, img_name_len);				// Copy name w/o ".bmp" extension
+	strncpy(out_name, img_name, img_name_len);							// Copy name w/o ".bmp" extension
 	out_name[img_name_len] = '\0';
 	strcat(out_name, gray_ext_str);
 	strcat(out_name, bmp_str);
@@ -140,15 +163,13 @@ assert(img_name);
 		return EXIT_FAILURE;
 	}
 
-	fwrite(file_header,sizeof(unsigned char),FILE_HEADER_SIZE,fOut);					//write the file_header back
-
 	// Inspect Data Offset
 	uint32_t DataOffset = *(uint32_t*)&file_header[DATA_OFFSET];
 	size_t bmp_header_len = DataOffset - FILE_HEADER_SIZE;
 
-	uint8_t bmp_header[bmp_header_len];				// Grabs the bmp header (and color table, if applicable)
+	unsigned char bmp_header[bmp_header_len];							// Grabs the bmp header (and color table, if applicable)
 
-	if (fread(bmp_header, sizeof(uint8_t), bmp_header_len, fIn) < bmp_header_len) {
+	if (fread(bmp_header, sizeof(unsigned char), bmp_header_len, fIn) < bmp_header_len) {
 		fprintf(stderr, "Not enough bytes were read from DIB and Color Table...\n");
 		perror(0);
 		errno = 0;
@@ -173,16 +194,18 @@ assert(header_type_str[DIB_size]);
 	printf("bitDepth (Bits Per Pixel): %" PRIu16 "\n", bitDepth);
 	printf("compression: %s\n", comprsn_type[compression]);
 
-assert(!(bmp_header_len - DIB_size));								// I honestly do not have the capacity to
-assert(compression == BI_RGB);									// deal with either of these, atm
+assert(!(bmp_header_len - DIB_size));									// I honestly do not have the capacity to
+assert(compression == BI_RGB || compression == BI_BITFIELDS);			// deal with either of these, atm
 
 	/* Ensures that output file is 24bit RGB */
-	if (bitDepth != GRAY_BITDEPTH) {
-		bmp_header[BITDEPTH-FILE_HEADER_SIZE+1] = 0;							// It's Little Endian
-		bmp_header[BITDEPTH-FILE_HEADER_SIZE] = (uint8_t) GRAY_BITDEPTH;		// Trust me, bro...
+	if (bitDepth != GRAY_BITDEPTH)
+		*(uint16_t*)&bmp_header[BITDEPTH-FILE_HEADER_SIZE] = (uint16_t) GRAY_BITDEPTH;
+	/* Ensures that output file compression is set to BI_RGB */
+	if (compression != BI_RGB) {
+		*(uint32_t*)&bmp_header[COMPRESSION-FILE_HEADER_SIZE] = (uint32_t) BI_RGB;
+		/* Set ImageSize in bmp header to 0 since we set compression of output to BI_RGB */
+		*(uint32_t*)&bmp_header[IMAGE_SIZE-FILE_HEADER_SIZE] = 0;
 	}
-
-	fwrite(bmp_header, sizeof(uint8_t), bmp_header_len, fOut);
 
 	int size = height*width;									//calculate image size
 
@@ -197,16 +220,30 @@ assert(compression == BI_RGB);									// deal with either of these, atm
 	img_dim[0] = width;
 	img_dim[1] = height;
 
-	size_t px_size = bitDepth < 8 ? 1 : bitDepth / 8;
-	unsigned char buffer[px_size];						//to store the image data
+assert(bitDepth >= GRAY_BITDEPTH);										// Again, no capacity for anything else
+	size_t px_size = bitDepth / 8;
+	/* Rows must be padded at the end to ensure their length is a multiple of 4 bytes */
+	size_t pad_in = (4 - ((px_size*width)%4)) % 4;						// Number of bytes to pad input
+	size_t pad_out = (4 - ((GRAY_BITDEPTH/8*width)%4)) % 4;				// Number of bytes to pad output
+
+	printf("File size of \"%s\" is: %" PRIu32 "\n", img_name, *(uint32_t*)&file_header[FILE_SIZE]);
+
+assert(!((pad_in + px_size*width) % 4));
+assert(!((pad_out + GRAY_BITDEPTH/8*width) % 4));
+
+	uint32_t out_filesize = FILE_HEADER_SIZE + bmp_header_len + (pad_out+GRAY_BITDEPTH/8*width)*height;
+	printf("File size of \"%s\" will be: %" PRIu32 "\n", out_name, out_filesize);
+	if (out_filesize != *(uint32_t*)&file_header[FILE_SIZE])
+		*(uint32_t*)&file_header[FILE_SIZE] = out_filesize;
+
+	fwrite(file_header,sizeof(unsigned char),FILE_HEADER_SIZE,fOut);					//write the file_header back
+	fwrite(bmp_header, sizeof(unsigned char), bmp_header_len, fOut);
+
+	unsigned char buffer[px_size];								//to store the image data
 	
 	size_t red = px_size - 3;
 	size_t green = px_size - 2;
 	size_t blue = px_size - 1;
-	/* Rows must be padded at the end to ensure their length is a multiple of 4 bytes */
-	size_t padding = (4 - ((px_size*width)%4)) % 4;				// Number of bytes to pad img row
-
-assert(!((padding + px_size*width) % 4));
 			
 	printf("Drawing grayscaled image into file: \"%s\"\n", out_name);
 	for(i=0;i<size;i++)											//RGB to gray
@@ -229,8 +266,8 @@ assert(!((padding + px_size*width) % 4));
 
 		/* Padding the rows */
 		if (!((i+1) % width)) {
-			uint8_t pad_buf[padding];
-			if (fread(pad_buf, sizeof(uint8_t), padding, fIn) < padding) {
+			unsigned char pad_buf_in[pad_in];
+			if (fread(pad_buf_in, sizeof(unsigned char), pad_in, fIn) < pad_in) {
 				fprintf(stderr, "Padding is too large...\n");
 				perror(0);
 				errno = 0;
@@ -238,7 +275,8 @@ assert(!((padding + px_size*width) % 4));
 				fclose(fIn);
 				return EXIT_FAILURE;
 			}
-			fwrite(pad_buf, sizeof(uint8_t), padding, fOut);
+			unsigned char pad_buf_out[pad_out];
+			fwrite(pad_buf_out, sizeof(unsigned char), pad_out, fOut);
 		}
 	}
 	
@@ -311,12 +349,27 @@ void generateAvgImg(char const* img_name, size_t nElem, size_t parent[nElem], Pi
 	fread(bmp_header, sizeof(unsigned char), bmp_header_size, instream);
 
 	uint32_t width = *(uint32_t*)&bmp_header[WIDTH - FILE_HEADER_SIZE];
+	uint32_t height = *(uint32_t*)&bmp_header[HEIGHT - FILE_HEADER_SIZE];
 	uint16_t bitDepth = *(uint16_t*)&bmp_header[BITDEPTH - FILE_HEADER_SIZE];
+	uint32_t compression = *(uint32_t*)&bmp_header[COMPRESSION - FILE_HEADER_SIZE];
+	size_t image_size = width*height;
+	size_t px_size = GRAY_BITDEPTH/8;
+	size_t pad_out = (4 - ((px_size*width)%4)) % 4;				// Number of bytes to pad img row
+	size_t out_filesize = FILE_HEADER_SIZE + bmp_header_size + (pad_out + px_size*width)*height;
+
+assert(nElem == image_size);
+assert(!((px_size*width + pad_out) % 4));
 	
-	if (bitDepth != GRAY_BITDEPTH) {
-		bmp_header[BITDEPTH-FILE_HEADER_SIZE+1] = 0;							// It's Little Endian
-		bmp_header[BITDEPTH-FILE_HEADER_SIZE] = (unsigned char) GRAY_BITDEPTH;		// Trust me, bro...
+assert(bitDepth >= GRAY_BITDEPTH);
+	if (bitDepth != GRAY_BITDEPTH)
+		*(uint16_t*)&bmp_header[BITDEPTH - FILE_HEADER_SIZE] = (uint16_t) GRAY_BITDEPTH;
+assert(compression == BI_RGB || compression == BI_BITFIELDS);
+	if (compression != BI_RGB) {
+		*(uint32_t*)&bmp_header[COMPRESSION - FILE_HEADER_SIZE] = (uint32_t) BI_RGB;
+		*(uint32_t*)&bmp_header[IMAGE_SIZE - FILE_HEADER_SIZE] = 0;
 	}
+	if (out_filesize != *(uint32_t*)&file_header[FILE_SIZE])
+		*(uint32_t*)&file_header[FILE_SIZE] = out_filesize;
 
 	ptrdiff_t img_name_len = strcasestr(img_name, bmp_str) - img_name;	// Length of img_name w/o extension
 	/* The absolute physical max merge_threshold could be is 256, but even anything close to 100 is
@@ -341,16 +394,6 @@ assert((FILE_HEADER_SIZE + bmp_header_size) == DataOffset);
 	fwrite(file_header, sizeof(unsigned char), FILE_HEADER_SIZE, outstream);
 	fwrite(bmp_header, sizeof(unsigned char), bmp_header_size, outstream);
 
-#ifndef NDEBUG
-uint32_t height = *(uint32_t*)&bmp_header[HEIGHT - FILE_HEADER_SIZE];
-size_t image_size = width*height;
-#endif
-	size_t px_size = GRAY_BITDEPTH/8;
-	size_t padding = (4 - ((px_size*width)%4)) % 4;				// Number of bytes to pad img row
-
-assert(nElem == image_size);
-assert(!((px_size*width + padding) % 4));
-
 	for (size_t i = 0; i < nElem; ++i) {
 		unsigned char pixel_data = getSegmentAvg(parent, i, segments);
 
@@ -360,8 +403,8 @@ assert(!((px_size*width + padding) % 4));
 
 		/* Padding the rows */
 		if (!((i+1) % width)) {
-			unsigned char pad_buf[padding];
-			fwrite(pad_buf, sizeof(unsigned char), padding, outstream);
+			unsigned char pad_buf[pad_out];
+			fwrite(pad_buf, sizeof(unsigned char), pad_out, outstream);
 		}
 	}
 
