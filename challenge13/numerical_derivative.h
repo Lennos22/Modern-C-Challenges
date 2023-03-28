@@ -6,6 +6,12 @@
 
 typedef double diff_function(double);
 
+/**
+  * @brief Computes the value of the derivative of F at x.
+  * @param F The pointer to the (mathematical) function.
+  * @param x The value with which to calculate the derivative.
+  * @return The value of f' at x.
+  */
 double f(diff_function* F, double x);
 
 #endif

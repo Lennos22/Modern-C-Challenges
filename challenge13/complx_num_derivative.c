@@ -28,7 +28,7 @@ static double const cr_eps = 0x1P-24;		// For Cauchy-Riemann check
  * differentiable, but I think I can ensure the Cauchy-Riemann
  * eqns. are satisfied!
  */
-double complex f(cmplx_diff_function* F, double complex z) {
+double complex cmplx_f(cmplx_diff_function* F, double complex z) {
 	double complex bi_difference = F(z + h_eps) - F(z - h_eps);
 
 	double complex bi_diff_imag = F(z + I*h_eps) - F(z - I*h_eps);
