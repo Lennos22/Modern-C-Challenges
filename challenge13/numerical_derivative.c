@@ -13,12 +13,9 @@
  */
 #include "numerical_derivative.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
-/* For your bog standard differentiable functions (sin(), exp(), etc.) */
-#include <tgmath.h>
-
+/* Actually, it seems like 2^-16 is the smallest you can go w/o getting inf
+ * or other such errors
+ */
 /* You can make this as small as you want! */
 static double const eps = 0x1P-16;
 

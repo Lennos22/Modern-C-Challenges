@@ -14,40 +14,27 @@
  */
 #include "complx_num_derivative.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 /* For complex.h */
 #include <tgmath.h>
 #include <float.h>
-
-/* Uncomment this to enable DEBUG mode */
-#define DEBUG
+#include <assert.h>
 
 /* Make this as small as you need */
-static double const h = 0x1P-32;
-#ifdef DEBUG
-static double const eps = 0x1P-24;
-#endif
+static double const h_eps = 0x1P-32;
+static double const cr_eps = 0x1P-24;		// For Cauchy-Riemann check
 
 /* Using two-sided differencing method. I can't really ensure the
  * pre-condition that the real and imaginary parts are partially
  * differentiable, but I think I can ensure the Cauchy-Riemann
  * eqns. are satisfied!
  */
-double complex f(double complex F(double complex), double complex z) {
-	double complex bi_difference = F(z + h) - F(z - h);
-#ifdef DEBUG
-printf("h interval is: %.3e\n", h);
-double complex bi_diff_imag = F(z + I*h) - F(z - I*h);
-double complex cauchy_riemann = bi_difference - bi_diff_imag;
-printf("Cauchy-Riemann check using eps = %.3e\n", eps);
-if (cabs(cauchy_riemann) < 0x1P-24)
-		printf("Function is complex differentiable @ %.3f + I*%.3f\n", creal(z), cimag(z));
-else {
-		printf("Function is not complex differentiable @ %.3f + I*%.3f. Exiting program...\n", creal(z), cimag(z));
-		return EXIT_FAILURE;
-}
-#endif
-	return bi_difference / (2 * h);
+double complex f(cmplx_diff_function* F, double complex z) {
+	double complex bi_difference = F(z + h_eps) - F(z - h_eps);
+
+	double complex bi_diff_imag = F(z + I*h_eps) - F(z - I*h_eps);
+	double complex cauchy_riemann = bi_difference - bi_diff_imag;
+assert(cabs(cauchy_riemann) < cr_eps);
+
+	
+	return bi_difference / (2 * h_eps);
 }

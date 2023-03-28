@@ -12,4 +12,6 @@
 
 typedef complex double cmplx_diff_function(complex double);
 
+double complex f(complx_diff_function* F, double complex z);
+
 #endif
