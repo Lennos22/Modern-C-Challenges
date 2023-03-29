@@ -14,11 +14,22 @@
  */
 #include "complx_num_derivative.h"
 
+#define NDEBUG
+
+#include <stdio.h>
+
 /* For complex.h */
 #include <tgmath.h>
-#include <float.h>
 #include <assert.h>
 
+/* Honestly, I can't tell you how random some values can be.
+ * If I calculate derivative of sin(z) at z = 10 + 10i,
+ * then 0x1P-32 gives a perfect 0 for CR check. However,
+ * when z = pi + i*pi, then the CR check is > 1. If I change
+ * h_eps to 0x1P-48, then CR check for pi + i*p is a perfect
+ * 0, but it becomes absurdly large for 10 + 10i. *shrugs*.
+ * You just can't win...
+ */
 /* Make this as small as you need */
 static double const h_eps = 0x1P-32;
 static double const cr_eps = 0x1P-32;		// For Cauchy-Riemann check
@@ -34,6 +45,8 @@ double complex cmplx_f(cmplx_diff_function* F, double complex z) {
 	double complex res_h = bi_diff_h / (2*h_eps);
 	double complex res_Ih = bi_diff_Ih / (2*I*h_eps);
 
+	if (cabs(res_h - res_Ih) >= cr_eps)
+		fprintf(stderr, "Warning, Cauchy-Riemann check is too high at this value. Result will be unstable.\n");
 assert(cabs(res_h - res_Ih) < cr_eps);
 
 	return res_h;

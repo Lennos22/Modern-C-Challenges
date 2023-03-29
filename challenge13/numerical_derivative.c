@@ -20,6 +20,6 @@
 static double const h_eps = 0x1P-16;
 
 /* Using a two-sided differencing method */
-double f(diff_function F, double x) {
+double f(diff_function* F, double x) {
 		return (F(x + h_eps) - F(x - h_eps)) / (2 * h_eps);
 }

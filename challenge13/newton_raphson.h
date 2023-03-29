@@ -4,7 +4,17 @@
 /** @file newton_raphson.h */
 #ifndef NEWTON_RAPHSON_H
 #define NEWTON_RAPHSON_H
+#include "numerical_derivative.h"
 
-double newton_method(double target, int dec_places);
+/**
+  * Employs the [Newton-Raphson method] to compute a root of a function near
+  * x_initial.
+  * @param F Function to calculate root.
+  * @param x_initial The initial guess of the location of a root.
+  * @param dec_places The number of decimal places to calculate root up to.
+  *
+  * [newton-raphson method]: https://en.wikipedia.org/wiki/Newton%27s_method
+  */
+double newton_raphson(diff_function* F, double x_initial, int dec_places);
 
 #endif

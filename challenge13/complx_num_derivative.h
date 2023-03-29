@@ -22,6 +22,10 @@ typedef complex double cmplx_diff_function(complex double);
   *		satisfy the [Cauchy-Riemann relations] at that point. 
   * @param z The value with which to calculate the derivative.
   * @return The value of F' at z.
+  * @warning This function will check whether Cauchy-Riemann
+  *		relations are satisfied. If NDEBUG is defined in TU,
+  *		the function will only give out a warning and continue
+  *		operation. Otherwise, it will abort the program.
   *
   * [Cauchy-Riemann relations]: https://en.wikipedia.org/wiki/Cauchy%E2%80%93Riemann_equations
   */
