@@ -21,7 +21,7 @@
 
 /* Make this as small as you need */
 static double const h_eps = 0x1P-32;
-static double const cr_eps = 0x1P-24;		// For Cauchy-Riemann check
+static double const cr_eps = 0x1P-32;		// For Cauchy-Riemann check
 
 /* Using two-sided differencing method. I can't really ensure the
  * pre-condition that the real and imaginary parts are partially
@@ -29,12 +29,12 @@ static double const cr_eps = 0x1P-24;		// For Cauchy-Riemann check
  * eqns. are satisfied!
  */
 double complex cmplx_f(cmplx_diff_function* F, double complex z) {
-	double complex bi_difference = F(z + h_eps) - F(z - h_eps);
+	double complex bi_diff_h = F(z + h_eps) - F(z - h_eps);
+	double complex bi_diff_Ih = F(z + I*h_eps) - F(z - I*h_eps);
+	double complex res_h = bi_diff_h / (2*h_eps);
+	double complex res_Ih = bi_diff_Ih / (2*I*h_eps);
 
-	double complex bi_diff_imag = F(z + I*h_eps) - F(z - I*h_eps);
-	double complex cauchy_riemann = bi_difference - bi_diff_imag;
-assert(cabs(cauchy_riemann) < cr_eps);
+assert(cabs(res_h - res_Ih) < cr_eps);
 
-	
-	return bi_difference / (2 * h_eps);
+	return res_h;
 }

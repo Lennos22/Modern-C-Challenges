@@ -18,11 +18,12 @@ typedef complex double cmplx_diff_function(complex double);
   * @note  For those not privy to Complex Analysis, for a complex
   *		function to be complex differentiable at a point z,
   *		it must be BOTH partially-differentiable AND
-  *		satisfy the [Cauchy-Riemann relations](https://en.wikipedia.org/wiki/Cauchy%E2%80%93Riemann_equations)
-  *		at that point. 
+  *		satisfy the [Cauchy-Riemann relations] at that point. 
   * @param z The value with which to calculate the derivative.
-  * @return The value of f' at z.
+  * @return The value of F' at z.
+  *
+  * [Cauchy-Riemann relations]: https://en.wikipedia.org/wiki/Cauchy%E2%80%93Riemann_equations
   */
-double complex cmplx_f(complx_diff_function* F, double complex z);
+double complex cmplx_f(cmplx_diff_function* F, double complex z);
 
 #endif
