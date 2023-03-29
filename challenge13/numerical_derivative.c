@@ -17,9 +17,9 @@
  * or other such errors
  */
 /* You can make this as small as you want! */
-static double const eps = 0x1P-16;
+static double const h_eps = 0x1P-16;
 
 /* Using a two-sided differencing method */
 double f(diff_function F, double x) {
-		return (F(x + eps) - F(x - eps)) / (2 * eps);
+		return (F(x + h_eps) - F(x - h_eps)) / (2 * h_eps);
 }

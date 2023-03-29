@@ -1,6 +1,7 @@
 /* Created by Nelson Cardona
  * Creation Date/Time: 28-03-23/17:03
  */
+/** @file complx_num_derivative.h */
 #ifndef COMPLX_NUM_DERIVATIVE_H
 #define COMPLX_NUM_DERIVATIVE_H
 
@@ -13,7 +14,7 @@
 typedef complex double cmplx_diff_function(complex double);
 
 /**
-  * @brief Computes the value of the complex derivate of F at z.
+  * Computes the value of the complex derivate of F at z.
   * @param F The pointer to the (mathematical) complex function.
   * @note  For those not privy to Complex Analysis, for a complex
   *		function to be complex differentiable at a point z,

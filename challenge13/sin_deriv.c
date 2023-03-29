@@ -1,6 +1,10 @@
 /* Created by Nelson Cardona
  * Creation Date/Time: 28-03-23/17:08
  */
+/**
+  * @file sin_deriv.c
+  * Takes user input x and calculates the derivative of sin(x).
+  */ 
 #include "numerical_derivative.h"
 
 #include <stdlib.h>

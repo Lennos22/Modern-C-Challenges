@@ -1,6 +1,10 @@
 /* Created by Nelson Cardona
  * Creation Date/Time: 29-03-23/16:30
  */
+/**
+  * @file cmplx_sin_deriv.c
+  * Takes user input z and calculates the derivative of sin(z).
+  */
 #include "complx_num_derivative.h"
 
 #include <stdlib.h>
