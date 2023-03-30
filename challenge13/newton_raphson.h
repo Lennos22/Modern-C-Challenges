@@ -7,6 +7,7 @@
 #include "numerical_derivative.h"
 
 #ifndef __STDC_NO_COMPLEX__
+#include "complx_num_derivative.h"
 #include <complex.h>
 #endif
 
@@ -22,7 +23,7 @@
 double newton_raphson(diff_function* F, double x_initial, int dec_places);
 
 #ifndef __STDC_NO_COMPLEX__
-double complex cmpls_newton_raphson(cmplx_diff_function* F, double complex z_initial, int dec_places);
+double complex cmplx_newton_raphson(cmplx_diff_function* F, double complex z_initial, int dec_places);
 #endif
 
 #endif
