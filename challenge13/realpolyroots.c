@@ -1,6 +1,15 @@
 /* Created by Nelson Cardona
  * Creation Date/Time: 30-03-23/13:21
  */
+/**
+  * @file realpolyroots.c
+  * Computes the roots of a polynomial of any degree.
+  *
+  * @note I know, I use a global variable for my polynomial function, see polynomial.c. The precision isn't the best. You can tighten the
+  * epsilon convergence value in newton_raphson.h, but you'll find that
+  * many of the whole number roots will still output with a fractional
+  * part. :(
+  */
 #include "polynomial.h"
 #include "newton_raphson.h"
 
@@ -32,8 +41,8 @@ int main(int argc, char* argv[argc+1]) {
 	size_t num_roots = poly_real_roots(polynomial_func, x_initial, &poly_in, roots);
 	printf("There are %zu roots in poly_in\n", num_roots);
 	for (size_t i = 0; i < num_roots; ++i)
-		printf("%g, ", roots[i]);
-	printf("\n");
+		printf("%.3f, ", roots[i]);
+	if (num_roots) printf("\n");
 
 	return EXIT_SUCCESS;
 }

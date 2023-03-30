@@ -13,7 +13,7 @@
 #error "NAN value is not supported. Cannot run newton_raphson()..."
 #endif
 
-static int const dec_places			= 7;
+static int const dec_places = 7;
 
 polynomial* poly_get(polynomial* poly_ptr, size_t degree, double coeff[degree+1]) {
 	// FUNCTION STUB. Fill in after learning malloc()...
@@ -69,7 +69,7 @@ size_t poly_real_roots(diff_function* poly_func, double x_initial, polynomial* p
 #ifndef NDEBUG
 printf("roots[%zu] = %g\n", num_roots, roots[num_roots]);
 #endif
-		if (isnan(roots[num_roots])) break;
+		if (isnan(roots[num_roots]) || isinf(roots[num_roots])) break;
 		polynomial factor = {
 			.degree = 1,
 			.coeff = (double[2]) { 
@@ -90,10 +90,13 @@ poly_print(p_ptr);
 
 void poly_print(polynomial const* poly_ptr) {
 	for (size_t i = 0; i <= poly_ptr->degree; ++i) {
-		printf("%gx^%zu", poly_ptr->coeff[poly_ptr->degree-i], poly_ptr->degree-i);
-		if (i == poly_ptr->degree)
-			printf("\n");
-		else
-			printf(" + ");
+		printf("%g", fabs(poly_ptr->coeff[poly_ptr->degree-i]));
+		if (i != poly_ptr->degree) {
+			if (poly_ptr->coeff[poly_ptr->degree-(i+1)] < 0)
+				printf("x^%zu - ", poly_ptr->degree-i);
+			else
+				printf("x^%zu + ", poly_ptr->degree-i);
+		}
 	}
+	printf("\n");
 }
