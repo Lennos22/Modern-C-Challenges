@@ -6,6 +6,7 @@
 #define POLYNOMIAL_H
 
 #include <stddef.h>
+#include <stdbool.h>
 #include <complex.h>
 
 typedef struct polynomial polynomial;
@@ -27,16 +28,24 @@ struct cmplx_polynomial {
 polynomial* poly_get(polynomial* poly_pty, size_t degree, double coeff[degree+1]);
 
 /**
+  * Checks whether polynomial is essentially zero.
+  * @param p_ptr Pointer to polynomial struct.
+  * @return whether every coefficient in p_ptr is zero.
+  */
+bool poly_is_zero(polynomial const* p_ptr);
+
+/**
   * Divides polynomial `dividend` by polynomial `divisor` and
   * stores result in `dividend`.
   * @param dividend Pointer to dividend where quotient will
   *			be stored.
   * @param divisor Pointer to polynomial that divides
   *			dividend.
-  * @note Result is returned in this way because we are
+  * @result true if remainder is zero (using poly_is_zero()).
+  * @note Quotient is returned in this way because we are not
   *			up to `malloc()`, yet.
   * @note `nr` in `divnr` means "no remainder".
   */
-void poly_divnr(polynomial* p_ptr1, polynomial* p_ptr2);
-void poly_print(polynomial* poly_ptr);
+bool poly_divnr(polynomial* dividend, polynomial const* divisor);
+void poly_print(polynomial const* poly_ptr);
 #endif

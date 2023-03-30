@@ -6,6 +6,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <tgmath.h>
+
+double polynomial_func(double x);
+
+static polynomial poly_in = { 0 };
 
 int main(int argc, char* argv[argc+1]) {
 	if (argc < 2) {
@@ -16,10 +21,8 @@ int main(int argc, char* argv[argc+1]) {
 	for (int i = 1; i < argc; ++i) {
 		in_coeff[argc-1-i] = strtod(argv[i], 0);
 	}
-	polynomial poly_in = {
-		.degree = argc-2,
-		.coeff = in_coeff,
-	};
+	poly_in.degree = argc-2,
+	poly_in.coeff = in_coeff,
 
 	printf("Polynomial (degree %zu) input is:\n", poly_in.degree);
 	poly_print(&poly_in);
@@ -31,9 +34,21 @@ int main(int argc, char* argv[argc+1]) {
 			[0] = 2,
 		},
 	};
-	poly_divnr(&poly_in, &test);
+	if (poly_divnr(&poly_in, &test))
+		printf("There is no remainder!\n");
+	else
+		printf("There is a remainder!\n");
 	printf("Quotient (now degree %zu) is:\n", poly_in.degree);
 	poly_print(&poly_in);
 
 	return EXIT_SUCCESS;
+}
+
+double polynomial_func(double x) {
+	double res = 0;
+	
+	for (size_t i = 0; i <= poly_in.degree; ++i)
+		res += poly_in.coeff[i]*pow(x, i);
+
+	return res;
 }

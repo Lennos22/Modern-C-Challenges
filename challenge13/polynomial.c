@@ -5,15 +5,24 @@
 
 #include <stdio.h>
 
+static double const eps = 0x1P-32;
+
 polynomial* poly_get(polynomial* poly_ptr, size_t degree, double coeff[degree+1]) {
 	// FUNCTION STUB. Fill in after learning malloc()...
 	return (void*)0;
 }
 
-void poly_divnr(polynomial* dividend, polynomial* divisor) {
+bool poly_is_zero(polynomial const* p_ptr) {
+	for (size_t i = 0; i < p_ptr->degree; ++i)
+		if (p_ptr->coeff[i] >= eps) return false;
+
+	return true;
+}
+
+bool poly_divnr(polynomial* dividend, polynomial const* divisor) {
 	if (dividend->degree < divisor->degree) {
 		fprintf(stderr, "Divisor is of larger degree than dividend...\n");
-		return;
+		return false;
 	}
 	size_t quot_degree = dividend->degree - divisor->degree;
 	double quot_coeff[quot_degree+1];
@@ -43,13 +52,18 @@ poly_print(dividend);
 printf("Final quotient is:\n");
 poly_print(&quotient);
 #endif
+
+	bool is_rem_zero = poly_is_zero(dividend);
+
 	/* Copy quotient into dividend */
 	dividend->degree = quot_degree;
 	for (size_t i = 0; i <= quot_degree; ++i)
 		dividend->coeff[i] = quot_coeff[i];
+	
+	return is_rem_zero;
 }
 
-void poly_print(polynomial* poly_ptr) {
+void poly_print(polynomial const* poly_ptr) {
 	for (size_t i = 0; i <= poly_ptr->degree; ++i) {
 		printf("%gx^%zu", poly_ptr->coeff[poly_ptr->degree-i], poly_ptr->degree-i);
 		if (i == poly_ptr->degree)
