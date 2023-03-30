@@ -19,12 +19,12 @@
 
 #define NDEBUG
 
-#ifndef NDEBUG
 #include <stdio.h>
-#endif
 
 /* for sin() */
 #include <tgmath.h>
+
+static const size_t max_iters = 32;
 
 /* Make sure your initial guess isn't on a stationary point.
  * Actually, there shouldn't be ANY stationary points between
@@ -39,18 +39,13 @@ double newton_raphson(diff_function* F, double x_initial, int dec_places) {
 		 * requires dec_places to be int instead of size_t!
 		 */
 		double precision = pow(10, -(dec_places + 1));
-#ifndef NDEBUG
-		printf("Beginning approximation of PI to %d decimal places\n", dec_places);
-		printf("The precision must, therefore, be %.*f\n", dec_places + 1, precision);
-		printf("Initial guess is: %f\n", ans);
-		size_t i = 0; // To keep track of iters while DEBUGGING
-#endif
+		size_t i = 0; // To keep track of iters while
 
-		while (fabs(F(ans)) >= precision) {
+		while (fabs(F(ans)) >= precision && i < max_iters) {
 				ans = ans - (F(ans))/f(F, ans);
-#ifndef NDEBUG
 				++i;
-				printf("Iteration %ld gives us: %.*f\n", i, dec_places, ans);
+#ifndef NDEBUG
+printf("Iteration %ld gives us: %.*f\n", i, dec_places, ans);
 #endif
 		}
 
