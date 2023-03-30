@@ -5,7 +5,7 @@
   * @file realpolyroots.c
   * Computes the roots of a polynomial of any degree.
   *
-  * @note I know, I use a global variable for my polynomial function, see polynomial.c. The precision isn't the best. You can tighten the
+  * @note I know, I use a global variable for my polynomial function, see poly_real_roots(). The precision isn't the best. You can tighten the
   * epsilon convergence value in newton_raphson.h, but you'll find that
   * many of the whole number roots will still output with a fractional
   * part. :(

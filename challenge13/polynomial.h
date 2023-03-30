@@ -54,7 +54,7 @@ void poly_divnr(polynomial* dividend, polynomial const* divisor);
   *			the roots.
   * @param p_ptr Pointer to the polynomial struct.
   * @note Currently, this is embedded into poly_func using a global
-  *			variable in main(). Again, I know it's bad.
+  *			variable in realpolyroots.c. Again, I know it's bad.
   * @param roots An array of doubles to output the root.
   * @return the total number of REAL roots (counting multiplicity).
   */

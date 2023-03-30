@@ -7,7 +7,7 @@
   * you set, here!) based on a user input z_initial value.
   */
 #include "newton_raphson.h"
-#include "numerical_derivative.h"
+#include "complx_num_derivative.h"
 
 #ifdef __STDC_NO_COMPLEX__
 #error "Error: Current C platform does not support complex arithmetic..."

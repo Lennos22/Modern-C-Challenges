@@ -1,2 +1,8 @@
+# Object files as a result of make
+*/*.o
+
+# Swap files from Vim
+*/*.swp
+
 # doxygen output in each challenge (Doxyfile will be provided for you. Generate it, yourself!)
 */doxygen/

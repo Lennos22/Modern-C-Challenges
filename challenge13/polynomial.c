@@ -10,7 +10,7 @@
 #include <tgmath.h>
 
 #ifndef NAN
-#error "NAN value is not supported. Cannot run newton_raphson()..."
+#error "NAN value is not supported. Cannot run poly_real_roots()..."
 #endif
 
 static int const dec_places = 7;

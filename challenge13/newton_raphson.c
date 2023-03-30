@@ -75,12 +75,12 @@ double complex cmplx_newton_raphson(cmplx_diff_function* F, double complex z_ini
 
 		while (cabs(F(ans)) >= precision && i < max_iters) {
 #ifndef NDEBUG
-				printf("Derivative of F at %g is: %g\n", ans, F(ans));
+				printf("Derivative of F at %g + i*%g is: %g + i*%g\n", creal(ans), cimag(ans), creal(F(ans)), cimag(F(ans)));
 #endif
 				ans = ans - (F(ans))/cmplx_f(F, ans);
 				++i;
 #ifndef NDEBUG
-printf("Iteration %ld gives us: %.*f\n", i, dec_places, ans);
+printf("Iteration %ld gives us: %.*f + i%.*f\n", i, dec_places, creal(ans), dec_places, cimag(ans));
 #endif
 		}
 

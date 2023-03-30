@@ -32,7 +32,7 @@
  */
 /* Make this as small as you need */
 static double const h_eps = 0x1P-32;
-static double const cr_eps = 0x1P-32;		// For Cauchy-Riemann check
+static double const cr_eps = 0x1P-16;		// For Cauchy-Riemann check
 
 /* Using two-sided differencing method. I can't really ensure the
  * pre-condition that the real and imaginary parts are partially
@@ -46,7 +46,7 @@ double complex cmplx_f(cmplx_diff_function* F, double complex z) {
 	double complex res_Ih = bi_diff_Ih / (2*I*h_eps);
 
 	if (cabs(res_h - res_Ih) >= cr_eps)
-		fprintf(stderr, "Warning, Cauchy-Riemann check is too high at this value. Result will be unstable.\n");
+		fprintf(stderr, "Warning, Cauchy-Riemann check is too high @ %g + i%g. Result will be unstable.\n", creal(z), cimag(z));
 assert(cabs(res_h - res_Ih) < cr_eps);
 
 	return res_h;
