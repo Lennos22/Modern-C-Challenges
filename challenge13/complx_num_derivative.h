@@ -11,7 +11,7 @@
 
 #include <complex.h>
 
-typedef complex double cmplx_diff_function(complex double);
+typedef double complex cmplx_diff_function(double complex);
 
 /**
   * Computes the value of the complex derivate of F at z.

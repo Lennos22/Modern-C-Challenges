@@ -16,6 +16,9 @@
  */
 #include "newton_raphson.h"
 #include "numerical_derivative.h"
+#ifndef __STDC_NO_COMPLEX__
+#include "complx_numerical_derivative.h"
+#endif
 
 #define NDEBUG
 
@@ -60,3 +63,29 @@ printf("Iteration %ld gives us: %.*f\n", i, dec_places, ans);
 
 		return ans;
 }
+
+#ifndef __STDC_NO_COMPLEX
+double complex cmplx_newton_raphson(cmplx_diff_function* F, double complex z_initial, int dec_places) {
+		double complex ans = z_initial;
+		/* The negation of dec_places in below computation
+		 * requires dec_places to be int instead of size_t!
+		 */
+		double complex precision = cpow(10, -(dec_places + 1));
+		size_t i = 0; // To keep track of iters while
+
+		while (cabs(F(ans)) >= precision && i < max_iters) {
+#ifndef NDEBUG
+				printf("Derivative of F at %g is: %g\n", ans, F(ans));
+#endif
+				ans = ans - (F(ans))/f(F, ans);
+				++i;
+#ifndef NDEBUG
+printf("Iteration %ld gives us: %.*f\n", i, dec_places, ans);
+#endif
+		}
+
+		ans = (i >= max_iters) ? NAN : ans;
+
+		return ans;
+}
+#endif
