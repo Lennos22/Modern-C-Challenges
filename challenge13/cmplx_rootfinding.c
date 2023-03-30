@@ -37,7 +37,7 @@ int main(int argc, char* argv[argc+1]) {
 	int num_dp = (argc >= 4) ? strtol(argv[3], 0, 0) : dp_default;
 	double complex root = cmplx_newton_raphson(F, z_in, num_dp);
 
-	printf("Root of sin(x) near %g + i*%g is x = %.*f + i*%.*f\n", creal(z_in), cimag(z_in), num_dp, creal(root), num_dp, cimag(root));
+	printf("Root of sin(z) near z = %g + i*%g is x = %.*f + i*%.*f\n", creal(z_in), cimag(z_in), num_dp, creal(root), num_dp, cimag(root));
 
 	return EXIT_SUCCESS;
 }
