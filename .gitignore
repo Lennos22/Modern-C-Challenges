@@ -1,3 +1,8 @@
+# Extension-less files (just build using the accompanying Makefile!)
+*
+!/**/
+!*.*
+
 # Object files as a result of make
 */*.o
 
