@@ -13,11 +13,16 @@
  */
 #include "numerical_derivative.h"
 
+/* Two-sided differencing is apparently used in many TI calculators
+ * and this is the value they use for h
+ */
+#define CALCULATOR_STANDARD 0.001
+
 /* Actually, it seems like 2^-16 is the smallest you can go w/o getting inf
  * or other such errors
  */
 /* You can make this as small as you want! */
-static double const h_eps = 0x1P-16;
+static double const h_eps = 0x1P-24;
 
 /* Using a two-sided differencing method */
 double f(diff_function* F, double x) {

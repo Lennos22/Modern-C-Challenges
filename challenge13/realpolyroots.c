@@ -13,33 +13,27 @@ double polynomial_func(double x);
 static polynomial poly_in = { 0 };
 
 int main(int argc, char* argv[argc+1]) {
-	if (argc < 2) {
-		fprintf(stderr, "Program requires arguments a, b, c, ... coeffecients of polynomial ax^n + bx^(n-1) + cx^(n-2) + ...\n");
+	if (argc < 3) {
+		fprintf(stderr, "Program requires arguments a, b, c, ... x_init coeffecients of polynomial ax^n + bx^(n-1) + cx^(n-2) + ... and initial guess\n");
 		return EXIT_FAILURE;
 	}
-	double in_coeff[argc-1];
-	for (int i = 1; i < argc; ++i) {
-		in_coeff[argc-1-i] = strtod(argv[i], 0);
+	double in_coeff[argc-2];
+	for (int i = 1; i < argc-1; ++i) {
+		in_coeff[argc-2-i] = strtod(argv[i], 0);
 	}
-	poly_in.degree = argc-2,
+	poly_in.degree = argc-3,
 	poly_in.coeff = in_coeff,
 
 	printf("Polynomial (degree %zu) input is:\n", poly_in.degree);
 	poly_print(&poly_in);
 
-	polynomial test = {
-		.degree = 1,
-		.coeff = (double[2]) {
-			[1] = 1,
-			[0] = 2,
-		},
-	};
-	if (poly_divnr(&poly_in, &test))
-		printf("There is no remainder!\n");
-	else
-		printf("There is a remainder!\n");
-	printf("Quotient (now degree %zu) is:\n", poly_in.degree);
-	poly_print(&poly_in);
+	double x_initial = strtod(argv[argc-1], 0);
+	double roots[poly_in.degree];
+	size_t num_roots = poly_real_roots(polynomial_func, x_initial, &poly_in, roots);
+	printf("There are %zu roots in poly_in\n", num_roots);
+	for (size_t i = 0; i < num_roots; ++i)
+		printf("%g, ", roots[i]);
+	printf("\n");
 
 	return EXIT_SUCCESS;
 }

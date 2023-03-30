@@ -24,7 +24,11 @@
 /* for sin() */
 #include <tgmath.h>
 
-static const size_t max_iters = 32;
+#ifndef NAN
+#error "NAN value is not supported. Cannot run newton_raphson()..."
+#endif
+
+static const size_t max_iters = 128;
 
 /* Make sure your initial guess isn't on a stationary point.
  * Actually, there shouldn't be ANY stationary points between
@@ -42,12 +46,17 @@ double newton_raphson(diff_function* F, double x_initial, int dec_places) {
 		size_t i = 0; // To keep track of iters while
 
 		while (fabs(F(ans)) >= precision && i < max_iters) {
+#ifndef NDEBUG
+				printf("Derivative of F at %g is: %g\n", ans, F(ans));
+#endif
 				ans = ans - (F(ans))/f(F, ans);
 				++i;
 #ifndef NDEBUG
 printf("Iteration %ld gives us: %.*f\n", i, dec_places, ans);
 #endif
 		}
+
+		ans = (i >= max_iters) ? NAN : ans;
 
 		return ans;
 }
