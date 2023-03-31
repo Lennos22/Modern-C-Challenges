@@ -7,9 +7,11 @@
   */
 #include "mergesort.h"
 #include "quicksort.h"
+#include "time_ops.h"
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 
 #define MERGESORT	0
@@ -17,6 +19,8 @@
 #define QSORT		2
 
 int compare_double(void const* a, void const* b);
+int compare_int(void const* a, void const* b);
+int compare_str(void const* a, void const* b);
 void file_open_err(char const filename[static 1]);
 
 enum {	buf_max = 32,	};
@@ -46,19 +50,30 @@ int main(int argc, char* argv[argc+1]) {
 	}
 	fclose(instream);
 
+	struct timespec begin = {0};
+	struct timespec end = {0};
 	switch (strtol(argv[4], 0, 0)) {
 		case MERGESORT:
 			printf("WE MERGIN' BBY!\n");
+			timespec_get(&begin, TIME_UTC);
 			mergesort(list, nitems, sizeof list[0], compare_double);
+			timespec_get(&end, TIME_UTC);
+			printf("Merge sort complete! ");
 			break;
 		case QUICKSORT:
 			printf("WE QUICKSORTIN' BBY!\n");
+			timespec_get(&begin, TIME_UTC);
 			quicksort(list, nitems, sizeof list[0], compare_double);
+			timespec_get(&end, TIME_UTC);
+			printf("Quick sort complete! ");
 			break;
 		default:
 			fprintf(stderr, "ERROR: Invalid sort code...\n");
 			return EXIT_FAILURE;
 	}
+	printf("Sort duration: ");
+	timespec_print(timespec_diff(end, begin));
+	printf("\n");
 
 	FILE* outstream = fopen(argv[2], "w");
 	if (!outstream) file_open_err(argv[2]);
@@ -77,6 +92,22 @@ int compare_double(void const* a, void const* b) {
 	if (*A < *B) return -1;
 	else if (*A > *B) return 1;
 	else return 0;
+}
+
+int compare_int(void const* a, void const* b) {
+	int const* A = a;
+	int const* B = b;
+
+	if (*A < *B) return -1;
+	else if (*A > *B) return 1;
+	else return 0;
+}
+
+int compare_str(void const* a, void const* b) {
+	char const* A = a;
+	char const* B = b;
+
+	return strcmp(A, B);
 }
 
 void file_open_err(char const filename[static 1]) {

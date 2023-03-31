@@ -29,6 +29,7 @@ int main(int argc, char* argv[argc-1]) {
 				if (n2 < n1) {
 					isSorted = false;
 				}
+				n1 = n2;
 				++nitems;
 			}
 			if (isSorted)

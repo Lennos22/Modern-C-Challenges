@@ -11,6 +11,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+int compare_double(void const* a, void const* b);
+int compare_int(void const* a, void const* b);
+int compare_str(void const* a, void const* b);
+
+typedef int compare(void const*, void const*);
+
+static compare* cmp_func = compare_double;
 
 enum { buf_max = 32, };
 
@@ -31,9 +40,10 @@ int main(int argc, char* argv[argc-1]) {
 			double n2 = 0;
 			while (fgets(buf, buf_max, instream)) {
 				n2 = strtod(buf, 0);
-				if (n2 < n1) {
+				if (cmp_func(&n1, &n2) > 0) {
 					isSorted = false;
 				}
+				n1 = n2;
 				++nitems;
 			}
 			if (isSorted)
@@ -48,4 +58,26 @@ int main(int argc, char* argv[argc-1]) {
 		}
 	}
 	return ret;
+}
+
+int compare_double(void const* a, void const* b) {
+	double const* A = a;
+	double const* B = b;
+	
+	if (*A < *B) return -1;
+	else if (*A > *B) return 1;
+	else return 0;
+}
+
+int compare_int(void const* a, void const* b) {
+	int const* A = a;
+	int const* B = b;
+
+	if (*A < *B) return -1;
+	else if (*A > *B) return 1;
+	else return 0;
+}
+
+int compare_str(void const* a, void const* b) {
+	return strcmp(a, b);
 }
