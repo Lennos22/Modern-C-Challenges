@@ -23,6 +23,10 @@ int compare_int(void const* a, void const* b);
 int compare_str(void const* a, void const* b);
 void file_open_err(char const filename[static 1]);
 
+typedef int compare(void const*, void const*);
+
+static compare* cmp_func = compare_double;
+
 enum {	buf_max = 32,	};
 
 int main(int argc, char* argv[argc+1]) {
@@ -56,14 +60,21 @@ int main(int argc, char* argv[argc+1]) {
 		case MERGESORT:
 			printf("WE MERGIN' BBY!\n");
 			timespec_get(&begin, TIME_UTC);
-			mergesort(list, nitems, sizeof list[0], compare_double);
+			mergesort(list, nitems, sizeof list[0], cmp_func);
 			timespec_get(&end, TIME_UTC);
 			printf("Merge sort complete! ");
 			break;
 		case QUICKSORT:
 			printf("WE QUICKSORTIN' BBY!\n");
 			timespec_get(&begin, TIME_UTC);
-			quicksort(list, nitems, sizeof list[0], compare_double);
+			quicksort(list, nitems, sizeof list[0], cmp_func);
+			timespec_get(&end, TIME_UTC);
+			printf("Quick sort complete! ");
+			break;
+		case QSORT:
+			printf("qsort()... really?...\n");
+			timespec_get(&begin, TIME_UTC);
+			qsort(list, nitems, sizeof list[0], cmp_func);
 			timespec_get(&end, TIME_UTC);
 			printf("Quick sort complete! ");
 			break;

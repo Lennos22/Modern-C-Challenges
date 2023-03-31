@@ -3,10 +3,12 @@
  */
 #include "time_ops.h"
 
+#define NDEBUG
+
 #include <stdlib.h>
 #include <stdio.h>
 
-#define NSECS_PER_SEC 1E+9;
+#define NSECS_PER_SEC 1E+9
 
 /* Returns the ABSOLUTE difference between two timespec values.
  * Adapted from Exs 43.
@@ -20,7 +22,7 @@ struct timespec timespec_diff(struct timespec ts1, struct timespec ts2) {
 printf("Initialised result: %zu.%09ld\n", result.tv_sec, result.tv_nsec);
 #endif
 
-	if (ts1.tv_sec < ts2.tv_sec) {
+	if (ts2.tv_sec > ts1.tv_sec) {
 #ifndef NDEBUG
 printf("ts1.tv_sec < ts2.tv_sec\n");
 #endif
@@ -29,7 +31,7 @@ printf("ts1.tv_sec < ts2.tv_sec\n");
 			--result.tv_sec;
 			result.tv_nsec = NSECS_PER_SEC - result.tv_nsec;
 		}
-	} else if (ts2.tv_sec < ts1.tv_sec) {
+	} else if (ts1.tv_sec > ts2.tv_sec) {
 #ifndef NDEBUG
 printf("ts2.tv_sec < ts1.tv_sec\n");
 #endif
@@ -43,6 +45,6 @@ printf("ts2.tv_sec < ts1.tv_sec\n");
 	return result;
 }
 
-void print_timespec(struct timespec ts) {
+void timespec_print(struct timespec ts) {
 	printf("%zu.%09lds", ts.tv_sec, ts.tv_nsec);
 }

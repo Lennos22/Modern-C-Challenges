@@ -11,10 +11,10 @@
   * Performs a quick sort on an array.
   *
   * Performs a quick sort on the array, @a base, of @a nmemb items that are @a
-  * size bytes. @a compar is the comparison criterion for the item type in @a
+  * size bytes. @a compar is the comparison criterion for the items in @a
   * base.
   *
-  * @param[in/out]	base	The array to sort.
+  * @param[in,out]	base	The array to sort.
   * @param[in]		nmemb	The number of items in the array.
   * @param[in]		size	The size (in bytes) of each item.
   * @param[in]		compar	The comparison criterion.

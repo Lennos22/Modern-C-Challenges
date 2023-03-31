@@ -6,6 +6,8 @@
 #include "mergesort.h"
 #include "byte_ops.h"
 
+#define NDEBUG
+
 #include <stdio.h>
 #include <assert.h>
 

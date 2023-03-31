@@ -15,7 +15,7 @@
 struct timespec timespec_diff(struct timespec ts1, struct timespec ts2);
 
 /**
-  * Prints @a ts in seconds.nanoseconds format.
+  * Prints @a The ts in `seconds.nanoseconds` format.
   * @param[in] ts timespec object that will be printed.
   */
 void timespec_print(struct timespec ts);

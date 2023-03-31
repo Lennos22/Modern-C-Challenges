@@ -6,6 +6,8 @@
 #include "quicksort.h"
 #include "byte_ops.h"
 
+#define NDEBUG
+
 #ifndef NDEBUG
 #include <stdio.h>
 #endif

@@ -4,6 +4,15 @@
  *
  * Creates a randomly generated list of integers from 0 to 1000 (inc.) and saves it in a file.
  */
+/**
+  * @file list_gen.c
+  * Created a random-generated list of integers from 0 to 1000.
+  *
+  * Generates a list of integers that are between 0 and 1000 (inc.). User must
+  * input the number of items to add as well as the name of the output text.
+  * @note The output text WILL NOT automatically add an extension to your file
+  * name, so you better put it in the argument.
+  */
 #include <time.h>
 #include <errno.h>
 #include <stdlib.h>
