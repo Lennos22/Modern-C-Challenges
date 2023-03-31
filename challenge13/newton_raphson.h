@@ -23,6 +23,16 @@
 double newton_raphson(diff_function* F, double x_initial, int dec_places);
 
 #ifndef __STDC_NO_COMPLEX__
+/**
+  * Employs the [Newton-Raphson method] to compute a root of a complex function near
+  * z_initial.
+  * @param F Complex function to calculate root.
+  * @param z_initial The initial guess of the location of a root.
+  * @param dec_places The number of decimal places to calculate root up to.
+  * @note To clarify, it's the number of decimal places of the MODULUS.
+  *
+  * [newton-raphson method]: https://en.wikipedia.org/wiki/Newton%27s_method
+  */
 double complex cmplx_newton_raphson(cmplx_diff_function* F, double complex z_initial, int dec_places);
 #endif
 

@@ -39,7 +39,7 @@ int main(int argc, char* argv[argc+1]) {
 	double x_initial = strtod(argv[argc-1], 0);
 	double roots[poly_in.degree];
 	size_t num_roots = poly_real_roots(polynomial_func, x_initial, &poly_in, roots);
-	printf("There are %zu roots in poly_in\n", num_roots);
+	printf("There are %zu roots in your polynomial:\n", num_roots);
 	for (size_t i = 0; i < num_roots; ++i)
 		printf("%.3f, ", roots[i]);
 	if (num_roots) printf("\n");

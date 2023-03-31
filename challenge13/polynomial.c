@@ -69,7 +69,7 @@ size_t poly_real_roots(diff_function* poly_func, double x_initial, polynomial* p
 #ifndef NDEBUG
 printf("roots[%zu] = %g\n", num_roots, roots[num_roots]);
 #endif
-		if (isnan(roots[num_roots]) || isinf(roots[num_roots])) break;
+		if (!isfinite(roots[num_roots])) break;
 		polynomial factor = {
 			.degree = 1,
 			.coeff = (double[2]) { 
@@ -100,3 +100,86 @@ void poly_print(polynomial const* poly_ptr) {
 	}
 	printf("\n");
 }
+
+#ifndef __STDC_NO_COMPLEX__
+void cmplx_poly_divnr(cmplx_polynomial* dividend, cmplx_polynomial const* divisor) {
+	if (dividend->degree < divisor->degree) {
+		fprintf(stderr, "Divisor is of larger degree than dividend...\n");
+		return;
+	}
+	size_t quot_degree = dividend->degree - divisor->degree;
+	double complex quot_coeff[quot_degree+1];
+#ifndef NDEBUG
+cmplx_polynomial quotient = {
+	.degree = quot_degree,
+	.coeff = quot_coeff,
+};
+#endif
+
+	for (size_t i = dividend->degree; i >= divisor->degree; --i) {
+		quot_coeff[i-divisor->degree] = dividend->coeff[i]/divisor->coeff[divisor->degree];
+#ifndef NDEBUG
+printf("quot_coeff[%zu] = %g+i*%g\n", i-divisor->degree, creal(quot_coeff[i-divisor->degree]), cimag(quot_coeff[i-divisor->degree]));
+#endif
+		for (size_t j = i; j >= i-divisor->degree; --j) {
+			dividend->coeff[j] -= quot_coeff[i-divisor->degree]*divisor->coeff[divisor->degree-(i-j)];
+			if (!j) break;
+		}
+#ifndef NDEBUG
+printf("dividend is now:\n");
+cmplx_poly_print(dividend);
+#endif
+		if (!i) break;
+	}
+#ifndef NDEBUG
+printf("Final quotient is:\n");
+cmplx_poly_print(&quotient);
+#endif
+
+	/* Copy quotient into dividend */
+	dividend->degree = quot_degree;
+	for (size_t i = 0; i <= quot_degree; ++i)
+		dividend->coeff[i] = quot_coeff[i];
+}
+
+size_t poly_cmplx_roots(cmplx_diff_function* cmplx_poly_func, double complex z_initial, cmplx_polynomial* cp_ptr, double complex roots[cp_ptr->degree]) {
+	size_t degree = cp_ptr->degree;
+	size_t num_roots = 0;
+
+	for (num_roots = 0; num_roots < degree; ++num_roots) {
+		roots[num_roots] = cmplx_newton_raphson(cmplx_poly_func, z_initial, dec_places);
+#ifndef NDEBUG
+printf("roots[%zu] = %g+i*%g\n", num_roots, creal(roots[num_roots]), cimag(roots[num_roots]));
+#endif
+		/* This check is no longer required courtesy of the Fundamental Theorem
+		 * of Algebra!!!
+		 */
+//		if (!isfinite(creal(roots[num_roots])) || !isfinite(creal(roots[num_roots]))) break;
+		cmplx_polynomial factor = {
+			.degree = 1,
+			.coeff = (double complex[2]) { 
+				[1] = 1,
+				[0] = -roots[num_roots],
+			},
+		};
+
+		cmplx_poly_divnr(cp_ptr, &factor);
+#ifndef NDEBUG
+printf("Polynomial is now reduced to:\n");
+cmplx_poly_print(cp_ptr);
+#endif
+	}
+
+	return num_roots;
+}
+
+void cmplx_poly_print(cmplx_polynomial const* cmplx_poly_ptr) {
+	for (size_t i = 0; i <= cmplx_poly_ptr->degree; ++i) {
+		printf("(%g+i*%g)", creal(cmplx_poly_ptr->coeff[cmplx_poly_ptr->degree-i]), cimag(cmplx_poly_ptr->coeff[cmplx_poly_ptr->degree-i]));
+		if (i != cmplx_poly_ptr->degree) {
+			printf("z^%zu + ", cmplx_poly_ptr->degree-i);
+		}
+	}
+	printf("\n");
+}
+#endif

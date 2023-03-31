@@ -84,7 +84,7 @@ printf("Iteration %ld gives us: %.*f + i%.*f\n", i, dec_places, creal(ans), dec_
 #endif
 		}
 
-		ans = (i >= max_iters) ? NAN : ans;
+		ans = (i >= max_iters) ? CMPLX(NAN, NAN) : ans;
 
 		return ans;
 }
