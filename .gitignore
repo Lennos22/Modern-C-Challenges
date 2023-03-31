@@ -2,6 +2,7 @@
 *
 !/**/
 !*.*
+!*file
 
 # Object files as a result of make
 */*.o
