@@ -4,12 +4,12 @@
  * Creation Date/Time: 31-03-23/13:26
  */
 #include "mergesort.h"
+#include "byte_ops.h"
 
 #include <stdio.h>
 #include <assert.h>
 
 void merge(unsigned char* left, unsigned char* right, size_t nmemb, size_t size, int (*compar)(void const*, void const*));
-void byte_cpy(void* dest, void const* src, size_t n);
 
 void mergesort(void* base, size_t nmemb, size_t size, int (*compar)(void const*, void const*)) {
 assert(base);
@@ -72,14 +72,4 @@ assert(l_index == left_size);
 assert(i == nmemb);
 	for (size_t j = 0; j < nmemb; ++j)
 		byte_cpy(left+j*size, buf+j*size, size);
-}
-
-void byte_cpy(void* dest, void const* src, size_t n) {
-assert(dest);
-assert(src);
-	unsigned char* Dest = dest;
-	unsigned char const* Src = src;
-
-	for (size_t i = 0; i < n; ++i)
-		*(Dest+i) = *(Src+i);
 }

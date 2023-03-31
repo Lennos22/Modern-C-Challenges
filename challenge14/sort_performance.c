@@ -6,6 +6,7 @@
   * Evaluates the performance of my sorting algorithms and qsort().
   */
 #include "mergesort.h"
+#include "quicksort.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -49,6 +50,10 @@ int main(int argc, char* argv[argc+1]) {
 		case MERGESORT:
 			printf("WE MERGIN' BBY!\n");
 			mergesort(list, nitems, sizeof list[0], compare_double);
+			break;
+		case QUICKSORT:
+			printf("WE QUICKSORTIN' BBY!\n");
+			quicksort(list, nitems, sizeof list[0], compare_double);
 			break;
 		default:
 			fprintf(stderr, "ERROR: Invalid sort code...\n");
