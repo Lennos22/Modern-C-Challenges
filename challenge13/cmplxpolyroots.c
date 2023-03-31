@@ -59,7 +59,7 @@ double complex cmplx_polynomial_func(double complex z) {
 	double complex res = 0;
 	
 	for (size_t i = 0; i <= cmplx_poly_in.degree; ++i)
-		res += cmplx_poly_in.coeff[i]*cpow(z, i);
+		res += i ? cmplx_poly_in.coeff[i]*cpow(z, i) : cmplx_poly_in.coeff[i];	// In case z = 0
 
 	return res;
 }

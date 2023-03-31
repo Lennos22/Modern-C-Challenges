@@ -73,6 +73,7 @@ double complex cmplx_newton_raphson(cmplx_diff_function* F, double complex z_ini
 		double precision = pow(10, -(dec_places + 1));
 		size_t i = 0; // To keep track of iters while
 
+		printf("Polynomial is %g+i*%g\n", creal(F(ans)), cimag(F(ans)));
 		while (cabs(F(ans)) >= precision && i < max_iters) {
 #ifndef NDEBUG
 				printf("Derivative of F at %g + i*%g is: %g + i*%g\n", creal(ans), cimag(ans), creal(F(ans)), cimag(F(ans)));

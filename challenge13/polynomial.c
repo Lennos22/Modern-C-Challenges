@@ -10,7 +10,7 @@
 #include <tgmath.h>
 
 #ifndef NAN
-#error "NAN value is not supported. Cannot run poly_real_roots()..."
+#error "NAN value is not supported. Cannot run poly_real_roots() or poly_cmplx_roots()..."
 #endif
 
 static int const dec_places = 7;
@@ -69,7 +69,12 @@ size_t poly_real_roots(diff_function* poly_func, double x_initial, polynomial* p
 #ifndef NDEBUG
 printf("roots[%zu] = %g\n", num_roots, roots[num_roots]);
 #endif
-		if (!isfinite(roots[num_roots])) break;
+		if (!isfinite(roots[num_roots])) {
+			if (!num_roots)
+				printf("Could not find any roots in polynomial. Your initial guess may have hit "	\
+						"a stationary point.\n");
+			break;
+		}
 		polynomial factor = {
 			.degree = 1,
 			.coeff = (double[2]) { 
@@ -153,8 +158,15 @@ printf("roots[%zu] = %g+i*%g\n", num_roots, creal(roots[num_roots]), cimag(roots
 #endif
 		/* This check is no longer required courtesy of the Fundamental Theorem
 		 * of Algebra!!!
+		 *
+		 * JUST KIDDING!!! It's still needed on the off (off, off, off, ...) chance your initial
+		 * guess hits PRECISELY at a stationary point.
 		 */
-//		if (!isfinite(creal(roots[num_roots])) || !isfinite(creal(roots[num_roots]))) break;
+		if (!isfinite(creal(roots[num_roots])) || !isfinite(creal(roots[num_roots]))) {
+			fprintf(stderr, "Unable to find root using Newton-Raphson. Your initial guess may have"	\
+					" been a stationary point...\n");
+			break;
+		}
 		cmplx_polynomial factor = {
 			.degree = 1,
 			.coeff = (double complex[2]) { 
