@@ -1,58 +1,58 @@
 CC		:= gcc
 STDC	:= -std=c11
-CFLAGS	:= -Wall
-LDFLAGS	:= -lm
+CFLAGS	:= $(STDC) -Wall -g
+LDLIBS	:= -lm
 TARGETS	:= sort_performance list_gen check_sorted
 
-all: ${TARGETS}
+all: $(TARGETS)
 
 ###############################################################################
 ###								EXECUTABLES									###
 ###############################################################################
 
 sort_performance: sort_performance.o mergesort.o quicksort.o byte_ops.o time_ops.o
-	${CC} ${STDC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
+	$(CC) -o $@ $^ $(LDLIBS)
 
 list_gen: list_gen.o
-	${CC} ${STDC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
+	$(CC) -o $@ $^ $(LDLIBS)
 
 check_sorted: check_sorted.o
-	${CC} ${STDC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
+	$(CC) -o $@ $^ $(LDLIBS)
 
 ###############################################################################
 ###								OBJECT FILES								###
 ###############################################################################
 
 sort_performance.o: sort_performance.c
-	${CC} ${STDC} ${CFLAGS} -c $^ ${LDFLAGS}
+	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
 
 list_gen.o: list_gen.c
-	${CC} ${STDC} ${CFLAGS} -c $^ ${LDFLAGS}
+	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
 
 check_sorted.o: check_sorted.c
-	${CC} ${STDC} ${CFLAGS} -c $^ ${LDFLAGS}
+	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
 
 mergesort.o: mergesort.c
-	${CC} ${STDC} ${CFLAGS} -c $^ ${LDFLAGS}
+	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
 
 quicksort.o: quicksort.c
-	${CC} ${STDC} ${CFLAGS} -c $^ ${LDFLAGS}
+	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
 
 byte_ops.o: byte_ops.c
-	${CC} ${STDC} ${CFLAGS} -c $^ ${LDFLAGS}
+	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
 
 time_ops.o: time_ops.c
-	${CC} ${STDC} ${CFLAGS} -c $^ ${LDFLAGS}
+	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
 
 ############
 ### MISC ###
 ############
 
 clean_objects:
-	rm -f *.o
+	$(RM) *.o
 
 clean_targets:
-	rm -f ${TARGETS}
+	$(RM) $(TARGETS)
 
 clean:
-	rm -f ${TARGETS} *.o
+	$(RM) $(TARGETS) *.o
