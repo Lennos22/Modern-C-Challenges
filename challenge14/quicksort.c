@@ -2,7 +2,6 @@
 /* Created by: Nelson Cardona
  * Creation Date/Time: 31-03-23/16:42
  */
-/* For SIZE_MAX */
 #include "quicksort.h"
 #include "byte_ops.h"
 
