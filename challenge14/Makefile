@@ -23,26 +23,26 @@ check_sorted: check_sorted.o
 ###								OBJECT FILES								###
 ###############################################################################
 
-sort_performance.o: sort_performance.c
-	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
+sort_performance.o: sort_performance.c mergesort.h quicksort.h time_ops.h
+	$(CC) $(CFLAGS) -c $<
 
 list_gen.o: list_gen.c
-	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
+	$(CC) $(CFLAGS) -c $<
 
 check_sorted.o: check_sorted.c
-	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
+	$(CC) $(CFLAGS) -c $<
 
-mergesort.o: mergesort.c
-	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
+mergesort.o: mergesort.c mergesort.h
+	$(CC) $(CFLAGS) -c $<
 
-quicksort.o: quicksort.c
-	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
+quicksort.o: quicksort.c quicksort.h
+	$(CC) $(CFLAGS) -c $<
 
-byte_ops.o: byte_ops.c
-	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
+byte_ops.o: byte_ops.c byte_ops.h
+	$(CC) $(CFLAGS) -c $<
 
-time_ops.o: time_ops.c
-	$(CC) $(CFLAGS) -c $^ $(LDLIBS)
+time_ops.o: time_ops.c time_ops.h
+	$(CC) $(CFLAGS) -c $<
 
 ############
 ### MISC ###
