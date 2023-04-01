@@ -1,6 +1,6 @@
 CC		:= gcc
 STDC	:= -std=c11
-CFLAGS	:= $(STDC) -Wall -g
+CFLAGS	:= $(STDC) -Wall
 LDLIBS	:= -lm
 TARGETS	:= sort_performance list_gen check_sorted
 
