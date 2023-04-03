@@ -3,7 +3,7 @@ STDC		:= -std=c11
 HARDMODE	:= -Wextra -Werror -pedantic-errors
 CFLAGS		:= $(STDC) -Wall $(HARDMODE)
 LDLIBS		:= -lm
-TARGETS		:= 
+TARGETS		:= test_polynomial
 
 all: $(TARGETS)
 
@@ -11,17 +11,17 @@ all: $(TARGETS)
 ###								EXECUTABLES									###
 ###############################################################################
 
-sort_performance: sort_performance.o mergesort.o quicksort.o time_ops.o
-
-list_gen: list_gen.o
-
-check_sorted: check_sorted.o
+test_polynomial: test_polynomial.o polynomial.o
 
 ###############################################################################
 ###								OBJECT FILES								###
 ###############################################################################
 
-vector.o: vector.c
+test_polynomial.o: test_polynomial.c
+
+vector.o: vector.c vector.h
+
+polynomial.o: polynomial.c polynomial.h
 
 ############
 ### MISC ###
