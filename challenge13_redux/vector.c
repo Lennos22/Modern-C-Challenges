@@ -26,7 +26,7 @@ double* vector_mult(size_t nelem, double dest[nelem], double k) {
 }
 
 double vector_dotproduct(size_t nelem, double const v[nelem], double const w[nelem]) {
-	double ret = 0;
+	double ret = 0.0;
 	if (v && w) {
 		for (size_t i = 0; i < nelem; ++i)
 			ret += v[i]*w[i];

@@ -2,16 +2,23 @@
  * Creation Date/Time: 03-04-23/20:06
  */
 #include "polynomial.h"
+#include "vector.h"
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
+#include <tgmath.h>
 
+/**
+  * `struct` representing a polynomial.
+  * @note	The number of coefficients a polynomial has is one more than its degree.
+  */
 struct polynomial {
-	size_t degree;
-	double* coeff;
+	size_t degree;	///< The degree of the polynomial.
+	double* coeff;	///< The coefficients of the polynomial.
 };
 
-polynomial* poly_init(polynomial* p, size_t degree, double coeff[degree+1]) {
+polynomial* poly_init(polynomial* p, size_t degree, double const coeff[degree+1]) {
 	if (p) {
 		*p = (polynomial) {
 			.degree = degree,
@@ -30,7 +37,7 @@ polynomial* poly_init(polynomial* p, size_t degree, double coeff[degree+1]) {
 	return p;
 }
 
-polynomial* poly_new(size_t degree, double coeff[degree+1]) {
+polynomial* poly_new(size_t degree, double const coeff[degree+1]) {
 	return poly_init(malloc(sizeof(polynomial)), degree, coeff);
 }
 
@@ -39,18 +46,26 @@ void poly_delete(polynomial* p) {
 	free(p);
 }
 
-size_t poly_getdegree(polynomial* p) {
+size_t poly_getdegree(polynomial const* p) {
 	return p->degree;
 }
 
-void poly_print(polynomial* p) {
-	putc('[', stdout);
+double poly_getcoeff(polynomial const* p, size_t n) {
+	return (n <= poly_getdegree(p)) ? p->coeff[n] : 0.0;
+}
+
+double polynomial_compute(polynomial const* p, double x) {
+	double ret = 0.0;
 	if (p) {
-		for (size_t i = 0; i <= poly_getdegree(p); ++i) {
-			printf("%g", p->coeff[i]);
-			if (i < poly_getdegree(p))
-				printf(", ");
-		}
+		for (size_t i = 0; i <= poly_getdegree(p); ++i)
+			ret += i ? poly_getcoeff(p, i)*pow(x, i) : poly_getcoeff(p, i);
 	}
-	putc(']', stdout);
+	return ret;
+}
+
+void poly_print(polynomial const* p) {
+	if (p)
+		vector_print(poly_getdegree(p)+1, p->coeff);
+	else
+		vector_print(0, 0);
 }

@@ -5,8 +5,13 @@
 #include <stdio.h>
 #include <errno.h>
 
-int main(void) {
-	polynomial* testpoly = poly_new(2, 0);
+int main(int argc, char* argv[argc+1]) {
+	if (argc != 2) {
+		fprintf(stderr, "Program requires one double argument\n");
+		return EXIT_FAILURE;
+	}
+	double x_in = strtod(argv[1], 0);
+	polynomial* testpoly = poly_new(2, (double[3]) {1, 2, 1});
 	if (!testpoly) {
 		fprintf(stderr, "Failed to initialize testpoly.\n");
 		perror(0);
@@ -19,6 +24,13 @@ int main(void) {
 	printf("testpoly elements are:\n");
 	poly_print(testpoly);
 	putc('\n', stdout);
+
+	printf("Testing poly_getcoeff():\n");
+	for (size_t i = 0; i <= poly_getdegree(testpoly); ++i)
+		printf("%g\n", poly_getcoeff(testpoly, i));
+
+	printf("Computing testpoly(x) at x = %g\n", x_in);
+	printf("testpoly(%g) = %g\n", x_in, polynomial_compute(testpoly, x_in));
 	poly_delete(testpoly);
 
 	printf("Printing null poly:\n");
