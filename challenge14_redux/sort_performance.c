@@ -52,6 +52,10 @@ int main(int argc, char* argv[argc+1]) {
 		if (!fgets(buf, buf_max, instream)) {
 			fprintf(stderr, "Reached EOF. Only received %zu items.\n", i);
 			nitems = i;
+			printf("Resizing memory for data in \"%s\" to %zu elements\n", argv[1], nitems);
+			double* new_list = realloc(list, nitems*sizeof(double));
+			if (new_list)
+				list = new_list;			// If realloc WAS NOT successful, then list should be unchanged.
 			break;
 		}
 		list[i] = strtod(buf, 0);
