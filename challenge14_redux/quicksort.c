@@ -10,6 +10,7 @@
 #ifndef NDEBUG
 #include <stdio.h>
 #endif
+#include <stddef.h>
 #include <string.h>
 #include <assert.h>
 
@@ -21,6 +22,9 @@ assert(base);
 	printf("Sorting %zu items of %zu bytes\n", nmemb, size);
 #endif
 	if (nmemb <= 1) return;
+	/* I've opted to track the pointer values instead of array indices so that
+	 * I don't have to worry about integer over/underflow when incr/decr left/right index
+	 */
 	unsigned char* left = base;
 	unsigned char* right = left + (nmemb-1)*size;
 	unsigned char* pivot = left + (nmemb/2)*size;
@@ -48,7 +52,7 @@ assert(base);
 	pivot = left;
 	left = base;
 
-	size_t l_size = (size_t) (pivot - left)/size;
+	ptrdiff_t l_size = (pivot - left)/size;
 	size_t r_size = nmemb - l_size - 1;
 #ifndef NDEBUG
 	printf("Split array into left partition of %zu members and right partition of %zu members\n", l_size, r_size);

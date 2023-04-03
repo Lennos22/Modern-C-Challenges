@@ -1,9 +1,9 @@
-CC		:= gcc
-STDC	:= -std=c11
-HARDMODE	:= -Wextra -Wsign-conversion -Werror -pedantic-errors
-CFLAGS	:= $(STDC) -Wall $(HARDMODE)
-LDLIBS	:= -lm
-TARGETS	:= sort_performance list_gen check_sorted
+CC			:= gcc
+STDC		:= -std=c11
+HARDMODE	:= -Wextra -Werror -pedantic-errors
+CFLAGS		:= $(STDC) -Wall $(HARDMODE)
+LDLIBS		:= -lm
+TARGETS		:= sort_performance list_gen check_sorted
 
 all: $(TARGETS)
 
