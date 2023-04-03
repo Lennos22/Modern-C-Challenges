@@ -3,14 +3,17 @@
  * Creation Date/Time: 31-03-23/16:42
  */
 #include "quicksort.h"
-#include "byte_ops.h"
 
 #define NDEBUG
 
+#include <stdlib.h>
 #ifndef NDEBUG
 #include <stdio.h>
 #endif
+#include <string.h>
 #include <assert.h>
+
+static inline void swap(void* p1, void* p2, size_t n);
 
 void quicksort(void* base, size_t nmemb, size_t size, int (*compar)(void const*, void const*)) {
 assert(base);
@@ -22,7 +25,7 @@ assert(base);
 	unsigned char* right = left + (nmemb-1)*size;
 	unsigned char* pivot = left + (nmemb/2)*size;
 
-	byte_swp(pivot, right, size);
+	swap(pivot, right, size);
 	pivot = right;
 	right -= size;
 
@@ -36,12 +39,12 @@ assert(base);
 		while (compar(right, pivot) > 0)
 			right -= size;
 		if (left >= right) break;
-		byte_swp(left, right, size);
+		swap(left, right, size);
 		left += size;
 		right -= size;
 	}
 
-	byte_swp(left, pivot, size);
+	swap(left, pivot, size);
 	pivot = left;
 	left = base;
 
@@ -54,4 +57,16 @@ assert(base);
 	/* DOUBLE RECURSION, BBY!!! */
 	quicksort(base, l_size, size, compar);
 	quicksort(pivot+size, r_size, size, compar);
+}
+
+static inline void swap(void* p1, void* p2, size_t n) {
+assert(dest);
+assert(src);
+	unsigned char* tmp = malloc(n*sizeof(unsigned char));
+	unsigned char* P1 = p1;
+	unsigned char* P2 = p2;
+
+	memcpy(tmp, P1, n);
+	memcpy(P1, P2, n);
+	memcpy(P2, tmp, n);
 }

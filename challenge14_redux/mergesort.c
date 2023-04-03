@@ -4,12 +4,12 @@
  * Creation Date/Time: 31-03-23/13:26
  */
 #include "mergesort.h"
-#include "byte_ops.h"
 
 #define NDEBUG
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 static void merge(unsigned char* left, unsigned char* right, size_t nmemb, size_t size, int (*compar)(void const*, void const*));
@@ -49,10 +49,10 @@ assert(left < right);
 	size_t r_index = 0;
 	while (l_index < left_size && r_index < right_size) {
 		if (compar(left+l_index*size, right+r_index*size) <= 0) {
-			byte_cpy(buf+i*size, left+l_index*size, size);
+			memcpy(buf+i*size, left+l_index*size, size);
 			++l_index;
 		} else {
-			byte_cpy(buf+i*size, right+r_index*size, size);
+			memcpy(buf+i*size, right+r_index*size, size);
 			++r_index;
 		}
 		++i;
@@ -61,20 +61,20 @@ assert(left < right);
 	if (l_index < left_size ) {
 assert(r_index == right_size);
 		for (size_t j = l_index; j < left_size; ++j) {
-			byte_cpy(buf+i*size, left+j*size, size);
+			memcpy(buf+i*size, left+j*size, size);
 			++i;
 		}
 	} else if (r_index < right_size) {
 assert(l_index == left_size);
 		for (size_t j = r_index; j < right_size; ++j) {
-			byte_cpy(buf+i*size, right+j*size, size);
+			memcpy(buf+i*size, right+j*size, size);
 			++i;
 		}
 	}
 
 assert(i == nmemb);
 	for (size_t j = 0; j < nmemb; ++j)
-		byte_cpy(left+j*size, buf+j*size, size);
+		memcpy(left+j*size, buf+j*size, size);
 	
 	free(buf);
 }

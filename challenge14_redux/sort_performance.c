@@ -18,6 +18,7 @@ int compare_double(void const* a, void const* b);
 int compare_int(void const* a, void const* b);
 int compare_str(void const* a, void const* b);
 void file_open_err(char const filename[static 1]);
+void enable_alignment_check(void);
 
 typedef int compare(void const*, void const*);
 
