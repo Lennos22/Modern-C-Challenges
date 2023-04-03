@@ -17,7 +17,7 @@ test_polynomial: test_polynomial.o polynomial.o vector.o
 ###								OBJECT FILES								###
 ###############################################################################
 
-test_polynomial.o: test_polynomial.c
+test_polynomial.o: test_polynomial.c polynomial.h vector.h
 
 vector.o: vector.c vector.h
 
