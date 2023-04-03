@@ -48,7 +48,7 @@ assert(base);
 	pivot = left;
 	left = base;
 
-	size_t l_size = (pivot - left)/size;
+	size_t l_size = (size_t) (pivot - left)/size;
 	size_t r_size = nmemb - l_size - 1;
 #ifndef NDEBUG
 	printf("Split array into left partition of %zu members and right partition of %zu members\n", l_size, r_size);
