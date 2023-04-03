@@ -11,7 +11,7 @@ all: $(TARGETS)
 ###								EXECUTABLES									###
 ###############################################################################
 
-test_polynomial: test_polynomial.o polynomial.o
+test_polynomial: test_polynomial.o polynomial.o vector.o
 
 ###############################################################################
 ###								OBJECT FILES								###

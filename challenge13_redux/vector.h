@@ -36,4 +36,11 @@ double* vector_mult(size_t nelem, double dest[nelem], double k);
   */
 double vector_dotproduct(size_t nelem, double const v[nelem], double const w[nelem]);
 
+/**
+  * Prints a vector, @a v, in horizontal form.
+  * @param[in]	nelem	The number of elements in @a v.
+  * @param[in]	v		The vector to print.
+  */
+void vector_print(size_t nelem, double const v[nelem]);
+
 #endif

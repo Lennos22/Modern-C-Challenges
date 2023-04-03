@@ -3,14 +3,14 @@
  */
 #include "vector.h"
 
-#include <stddef.h>
+#include <stdio.h>
 
 double* vector_add(size_t nelem, double dest[nelem], double const src[nelem]) {
 	double* ret = 0;
 	if (dest && src) {
 		ret = dest;
 		for (size_t i = 0; i < nelem; ++i)
-			dest[nelem] += src[nelem];
+			dest[i] += src[i];
 	}
 	return ret;
 }
@@ -20,7 +20,7 @@ double* vector_mult(size_t nelem, double dest[nelem], double k) {
 	if (dest) {
 		ret = dest;
 		for (size_t i = 0; i < nelem; ++i)
-			dest[nelem] *= k;
+			dest[i] *= k;
 	}
 	return ret;
 }
@@ -32,4 +32,16 @@ double vector_dotproduct(size_t nelem, double const v[nelem], double const w[nel
 			ret += v[i]*w[i];
 	}
 	return ret;
+}
+
+void vector_print(size_t nelem, double const v[nelem]) {
+	putc('[', stdout);
+	if (v) {
+		for (size_t i = 0; i < nelem; ++i) {
+			printf("%g", v[i]);
+			if (i < nelem-1)
+				printf(", ");
+		}
+	}
+	putc(']', stdout);
 }
