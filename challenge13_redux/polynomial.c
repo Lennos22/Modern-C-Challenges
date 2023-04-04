@@ -22,7 +22,7 @@ polynomial* poly_init(polynomial* p, size_t degree, double const coeff[degree+1]
 	if (p) {
 		*p = (polynomial) {
 			.degree = degree,
-				.coeff = malloc(sizeof(double[degree+1])),
+			.coeff = malloc(sizeof(double[degree+1])),
 		};
 		if (coeff) {
 			for (size_t i = 0; i <= degree; ++i)
@@ -62,10 +62,12 @@ polynomial* poly_resize(polynomial* p, size_t new_degree) {
 }
 
 size_t poly_getdegree(polynomial const* p) {
+assert(p);
 	return p->degree;
 }
 
 double poly_getcoeff(polynomial const* p, size_t n) {
+assert(p);
 	return (n <= poly_getdegree(p)) ? p->coeff[n] : 0.0;
 }
 
