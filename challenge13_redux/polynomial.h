@@ -41,6 +41,16 @@ polynomial* poly_new(size_t degree, double const coeff[degree+1]);
 void poly_delete(polynomial* p);
 
 /**
+  * Resizes a polynomial object to degree @a new_degree and zero inits new coefficients.
+  * @param[in,out]	p			Pointer to polynomial object.
+  * @param[in]		new_degree	New degree of @a p.
+  * @return Returns back the pointer @a p.
+  * @note	If the @new_degree happens to be smaller than @a p 's degree, or `realloc` of @a p 's
+  *			coefficients fails, then nothing happens to @a p. If p is NULL, then return is 0.
+  */
+polynomial* poly_resize(polynomial* p, size_t new_degree);
+
+/**
   * Gets the degree of polynomial @a p.
   * @param[in]	p	Pointer to the polynomial object.
   * @return	The degree of polynomial @a p.

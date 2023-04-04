@@ -46,6 +46,19 @@ void poly_delete(polynomial* p) {
 	free(p);
 }
 
+polynomial* poly_resize(polynomial* p, size_t new_degree) {
+	if (p && p->degree < new_degree) {
+		double* new_coeff = realloc(p->coeff, sizeof(double[new_degree+1]));
+		if (new_coeff) {
+			for (size_t i = p->degree+1; i <= new_degree; ++i)
+				new_coeff[i] = 0;
+			p->degree = new_degree;
+			p->coeff = new_coeff;
+		}
+	}
+	return p;
+}
+
 size_t poly_getdegree(polynomial const* p) {
 	return p->degree;
 }

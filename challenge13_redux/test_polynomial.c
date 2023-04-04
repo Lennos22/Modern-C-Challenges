@@ -31,6 +31,13 @@ int main(int argc, char* argv[argc+1]) {
 
 	printf("Computing testpoly(x) at x = %g\n", x_in);
 	printf("testpoly(%g) = %g\n", x_in, polynomial_compute(testpoly, x_in));
+
+	printf("Resizing testpoly to 10th degree polynomial:\n");
+	if (!poly_resize(testpoly, 10))
+		fprintf(stderr, "p is invalid...\n");
+	printf("testpoly is now %zuth degree and its elements are:\n", poly_getdegree(testpoly));
+	poly_print(testpoly);
+	putc('\n', stdout);
 	poly_delete(testpoly);
 
 	printf("Printing null poly:\n");
