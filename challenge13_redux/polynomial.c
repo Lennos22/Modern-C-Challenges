@@ -86,7 +86,7 @@ polynomial* poly_add(polynomial* dest, polynomial const* src) {
 
 polynomial* poly_mult(polynomial* dest, double k) {
 	if (dest) {
-		if (!vector_mult(poly_getdegree(dest), dest->coeff, k))
+		if (!vector_mult(poly_getdegree(dest)+1, dest->coeff, k))
 			return 0;
 	}
 	return dest;
