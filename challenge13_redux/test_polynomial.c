@@ -38,7 +38,6 @@ int main(int argc, char* argv[argc+1]) {
 	printf("testpoly is now %zuth degree and its elements are:\n", poly_getdegree(testpoly));
 	poly_print(testpoly);
 	putc('\n', stdout);
-	poly_delete(testpoly);
 
 	printf("Printing null poly:\n");
 	poly_print(0);
@@ -70,4 +69,39 @@ int main(int argc, char* argv[argc+1]) {
 	putc('\n', stdout);
 
 	printf("Dot product of v and w is: %g\n", vector_dotproduct(5, v, vector_mult(5, w, -1)));
+
+	printf("Generating polynomials from v and w.\n");
+	polynomial* vpoly = poly_new(4, v);
+	polynomial* wpoly = poly_new(4, w);
+
+	printf("Polynomial v is: ");
+	poly_print(vpoly);
+	putc('\n', stdout);
+	printf("Polynomial w is: ");
+	poly_print(wpoly);
+	putc('\n', stdout);
+
+	printf("Adding v into w gives: ");
+	poly_print(poly_add(wpoly, vpoly));
+	putc('\n', stdout);
+
+	printf("Multipliying w by 3.14 gives: ");
+	poly_print(poly_mult(wpoly, 3.14));
+	putc('\n', stdout);
+
+	printf("Subtracting v from (1/3.14)w gives: ");
+	poly_print(poly_add(poly_mult(wpoly, 1.0/3.14), poly_mult(vpoly, -1)));
+	putc('\n', stdout);
+
+	printf("Resizing testpoly back to 2nd degree: ");
+	poly_print(poly_resize(testpoly, 2));
+	putc('\n', stdout);
+
+	printf("Subtracting v from testpoly gives: ");
+	poly_print(poly_add(testpoly, vpoly));
+	putc('\n', stdout);
+
+	poly_delete(testpoly);
+	poly_delete(vpoly);
+	poly_delete(wpoly);
 }

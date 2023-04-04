@@ -47,14 +47,16 @@ void poly_delete(polynomial* p) {
 }
 
 polynomial* poly_resize(polynomial* p, size_t new_degree) {
-	if (p && p->degree < new_degree) {
+	if (p && p->degree != new_degree) {
 		double* new_coeff = realloc(p->coeff, sizeof(double[new_degree+1]));
-		if (new_coeff) {
+		if (!new_coeff)
+			return 0;
+		if (poly_getdegree(p) < new_degree) {
 			for (size_t i = p->degree+1; i <= new_degree; ++i)
 				new_coeff[i] = 0;
-			p->degree = new_degree;
-			p->coeff = new_coeff;
 		}
+		p->degree = new_degree;
+		p->coeff = new_coeff;
 	}
 	return p;
 }
@@ -65,6 +67,29 @@ size_t poly_getdegree(polynomial const* p) {
 
 double poly_getcoeff(polynomial const* p, size_t n) {
 	return (n <= poly_getdegree(p)) ? p->coeff[n] : 0.0;
+}
+
+polynomial* poly_add(polynomial* dest, polynomial const* src) {
+	if (dest && src) {
+		size_t max_degree = (poly_getdegree(dest) > poly_getdegree(src))	\
+			? poly_getdegree(dest) : poly_getdegree(src);
+		if (poly_getdegree(dest) < max_degree) {
+			if (!poly_resize(dest, max_degree))
+				return 0;
+		}
+		if (!vector_add(max_degree+1, dest->coeff, src->coeff))
+			return 0;
+		return dest;
+	}
+	return 0;
+}
+
+polynomial* poly_mult(polynomial* dest, double k) {
+	if (dest) {
+		if (!vector_mult(poly_getdegree(dest), dest->coeff, k))
+			return 0;
+	}
+	return dest;
 }
 
 double polynomial_compute(polynomial const* p, double x) {

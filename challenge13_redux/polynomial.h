@@ -44,9 +44,10 @@ void poly_delete(polynomial* p);
   * Resizes a polynomial object to degree @a new_degree and zero inits new coefficients.
   * @param[in,out]	p			Pointer to polynomial object.
   * @param[in]		new_degree	New degree of @a p.
-  * @return Returns back the pointer @a p.
-  * @note	If the @new_degree happens to be smaller than @a p 's degree, or `realloc` of @a p 's
-  *			coefficients fails, then nothing happens to @a p. If p is NULL, then return is 0.
+  * @return Returns back the pointer @a p. 0, if reallocation fails.
+  * @note	If @a new_degree is smaller than @a p 's degree, higher degrees will be truncated. If
+  *			@a new_degree is larger, then higher degree will be **zero initialized**. If @a
+  *			new_degree is equal, nothing happens.
   */
 polynomial* poly_resize(polynomial* p, size_t new_degree);
 
@@ -56,6 +57,22 @@ polynomial* poly_resize(polynomial* p, size_t new_degree);
   * @return	The degree of polynomial @a p.
   */
 size_t poly_getdegree(polynomial const* p);
+
+/**
+  * Adds two polynomials, @a dest and @a src, together and stores result in @a dest.size
+  * @param[in,out]	dest	Pointer to polynomial that holds result of addition.
+  * @param[in]		src		Pointer to polynomial that will be added to @a dest.
+  * @return	@a dest if addition was successful. 0, otherwise.
+  */
+polynomial* poly_add(polynomial* dest, polynomial const* src);
+
+/**
+  * Multiplies polynomial @a dest by scalar @a k and stores result back into @a dest.
+  * @param[in,out]	dest	Pointer to polynomial object that will also store result.
+  * @param[in]		k		Scalar to multiply @a dest by.
+  * @return	Returns @a dest if successful. 0, otherwise.
+  */
+polynomial* poly_mult(polynomial* dest, double k);
 
 /**
   * Gets the value of the @a n th coefficient of polynomial @a p.
