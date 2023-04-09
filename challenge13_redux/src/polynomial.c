@@ -3,6 +3,7 @@
  */
 #include "polynomial.h"
 #include "vector.h"
+#include "math_util.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,6 +18,15 @@ struct polynomial {
 	size_t degree;	///< The degree of the polynomial.
 	double* coeff;	///< The coefficients of the polynomial.
 };
+
+#ifdef NAN
+static double poly_newton_raphson(polynomial const* p, double x_init, double abs_eps,
+		double rel_eps, size_t max_iters);
+#endif
+
+double const AbsEps = 1E-10;
+double const RelEps = 1E-08;
+size_t const MaxIters = 256;
 
 polynomial* poly_init(polynomial* p, size_t degree, double const coeff[degree+1]) {
 	if (p) {
@@ -133,9 +143,36 @@ double polynomial_compute(polynomial const* p, double x) {
 	return ret;
 }
 
+double poly_comp_deriv(polynomial const* p, double x) {
+	double ret = 0.0;
+	if (p && poly_getdegree(p)) {	// derivative of zero-th degree polynomials is 0!
+		for (size_t i = 1; i <= poly_getdegree(p); ++i) {
+			ret += (i-1) ? i*poly_getcoeff(p, i)*pow(x, i-1) : poly_getcoeff(p, i);
+		}
+	}
+	return ret;
+}
+
+double poly_findroot(polynomial const* p, double x_init) {
+	return poly_newton_raphson(p, x_init, AbsEps, RelEps, MaxIters);
+}
+
 void poly_print(polynomial const* p) {
 	if (p)
 		vector_print(poly_getdegree(p)+1, p->coeff);
 	else
 		vector_print(0, 0);
 }
+
+#ifdef NAN
+static double poly_newton_raphson(polynomial const* p, double x_init, double abs_eps,
+		double rel_eps, size_t max_iters) {
+	double ans = x_init;
+	size_t i = 0;
+	while (!is_zerod(polynomial_compute(p, ans), abs_eps, rel_eps) && i < max_iters) {
+		ans -= polynomial_compute(p, ans)/poly_comp_deriv(p, ans);
+		++i;
+	}
+	return (!p || i >= max_iters) ? NAN : ans;
+}
+#endif

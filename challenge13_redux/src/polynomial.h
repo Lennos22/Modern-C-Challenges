@@ -94,12 +94,28 @@ polynomial* poly_mult(polynomial* dest, double k);
 polynomial* poly_div(polynomial* dest, polynomial const* src);
 
 /**
-  * Computes the polynomial @p at @a x.
+  * Computes the polynomial @a p at @a x.
   * @param[in]	p	Pointer to the polynomial object.
   * @param[in]	x	The input to polynomial @a p.
   * @return	The value of the polynomial @a p at @a x. Will return 0 if p is NULL.
   */
 double polynomial_compute(polynomial const* p, double x);
+
+/**
+  * Computes the derivative of polynomial @a p at @a x.
+  * @param[in]	p	Pointer to the polynomial object.
+  * @param[in]	x	The input to polynomial @a p.
+  * @return	The value of the derivative of polynomial @a p at @a x. Will return 0 if p is NULL.
+  */
+double poly_comp_deriv(polynomial const* p, double x);
+
+/**
+  * Finds a root of polynomial @a p based on an initial guess @a x.
+  * @param[in]	p		Pointer to the polynomial object.
+  * @param[in]	x_init	Initial guess.
+  * @return	A root closest to @a x_init. If unable to find root, will return NAN.
+  */
+double poly_findroot(polynomial const* p, double x_init);
 
 /**
   * Prints the coefficients of polynomial @a p in vector form.

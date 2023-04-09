@@ -3,7 +3,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <tgmath.h>
 #include <errno.h>
+
+#ifndef NAN
+# error "ERROR: NAN value is not supported on current C platform..."
+#endif
 
 int main(int argc, char* argv[argc+1]) {
 	if (argc != 2) {
@@ -31,6 +36,9 @@ int main(int argc, char* argv[argc+1]) {
 
 	printf("Computing testpoly(x) at x = %g\n", x_in);
 	printf("testpoly(%g) = %g\n", x_in, polynomial_compute(testpoly, x_in));
+
+	printf("Computing derivative of testpoly at x = %g\n", x_in);
+	printf("testpoly'(%g) = %g\n", x_in, poly_comp_deriv(testpoly, x_in));
 
 	printf("Resizing testpoly to 10th degree polynomial:\n");
 	if (!poly_resize(testpoly, 10))
@@ -100,7 +108,6 @@ int main(int argc, char* argv[argc+1]) {
 	printf("Subtracting v from testpoly gives: ");
 	poly_print(poly_add(testpoly, vpoly));
 	putc('\n', stdout);
-#endif
 	
 	polynomial* testfactor = poly_new(1, (double[2]) { 1, 1 });
 	printf("Dividing testpoly by testfactor: ");
@@ -111,9 +118,13 @@ int main(int argc, char* argv[argc+1]) {
 	printf("Result is: ");
 	poly_print(testpoly);
 	putc('\n', stdout);
+	poly_delete(testfactor);
+#endif
+
+	printf("Finding a root of testpoly at x = %g\n", x_in);
+	printf("A root of testpoly is: %g\n", poly_findroot(testpoly, x_in));
 
 	poly_delete(testpoly);
 	poly_delete(vpoly);
 	poly_delete(wpoly);
-	poly_delete(testfactor);
 }
