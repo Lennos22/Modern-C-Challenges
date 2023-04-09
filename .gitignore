@@ -5,12 +5,12 @@
 !*file
 
 # Build files as a result of make
-*/*.o
-*/*.d
-*/build/
+**/*.o
+**/*.d
+**/build/
 
 # Swap files from Vim
-*/*.swp
+**/*.swp
 
 # doxygen output in each challenge (Doxyfile will be provided for you. Generate it, yourself!)
-*/doxygen/
+**/doxygen/
