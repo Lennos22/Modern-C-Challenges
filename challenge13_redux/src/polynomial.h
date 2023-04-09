@@ -8,7 +8,7 @@
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
 
-#include <stddef.h>
+#include <stddef.h> //
 
 typedef struct polynomial polynomial;
 
