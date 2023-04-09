@@ -73,9 +73,11 @@ assert(p);
 
 polynomial* poly_add(polynomial* dest, polynomial const* src) {
 	if (dest && src) {
-		size_t max_degree = (poly_getdegree(dest) > poly_getdegree(src))	\
-			? poly_getdegree(dest) : poly_getdegree(src);
-		if (poly_getdegree(dest) < max_degree) {
+		size_t dest_degree = poly_getdegree(dest);
+		size_t src_degree = poly_getdegree(src);
+		size_t max_degree = (dest_degree > src_degree) ? dest_degree : src_degree;
+
+		if (dest_degree < max_degree) {
 			if (!poly_resize(dest, max_degree))
 				return 0;
 		}
@@ -92,6 +94,34 @@ polynomial* poly_mult(polynomial* dest, double k) {
 			return 0;
 	}
 	return dest;
+}
+
+polynomial* poly_div(polynomial* dest, polynomial const* src) {
+	if (dest && src) {
+		size_t dest_degree = poly_getdegree(dest);
+		size_t src_degree = poly_getdegree(src);
+		if (dest_degree < src_degree)
+			return 0;
+		size_t quot_degree = dest_degree - src_degree;
+		double* quot_coeff = malloc((quot_degree+1)*sizeof(double));
+		if (!quot_coeff)
+			return 0;
+
+		for (size_t i = 0; i <= quot_degree; ++i) {
+			quot_coeff[quot_degree-i] = dest->coeff[dest_degree-i]/src->coeff[src_degree];
+			for (size_t j = 0; j <= src_degree; ++j) {
+				dest->coeff[dest_degree-i-j] -= quot_coeff[quot_degree-i]
+					* src->coeff[src_degree-j];
+			}
+		}
+
+		free(dest->coeff);
+		dest->degree = quot_degree;
+		dest->coeff = quot_coeff;
+		
+		return dest;
+	}
+	return 0;
 }
 
 double polynomial_compute(polynomial const* p, double x) {

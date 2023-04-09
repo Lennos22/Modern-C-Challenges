@@ -59,6 +59,15 @@ polynomial* poly_resize(polynomial* p, size_t new_degree);
 size_t poly_getdegree(polynomial const* p);
 
 /**
+  * Gets the value of the @a n th coefficient of polynomial @a p.
+  * @param[in]	p	Pointer to the polynomial object.
+  * @param[in]	n	The position of the coefficient to be received.
+  * @return	The @a n th coefficient of polynomial @a p. If n is larger than the degree of @a p,
+  *			then it will return 0.
+  */
+double poly_getcoeff(polynomial const* p, size_t n);
+
+/**
   * Adds two polynomials, @a dest and @a src, together and stores result in @a dest.size
   * @param[in,out]	dest	Pointer to polynomial that holds result of addition.
   * @param[in]		src		Pointer to polynomial that will be added to @a dest.
@@ -75,13 +84,14 @@ polynomial* poly_add(polynomial* dest, polynomial const* src);
 polynomial* poly_mult(polynomial* dest, double k);
 
 /**
-  * Gets the value of the @a n th coefficient of polynomial @a p.
-  * @param[in]	p	Pointer to the polynomial object.
-  * @param[in]	n	The position of the coefficient to be received.
-  * @return	The @a n th coefficient of polynomial @a p. If n is larger than the degree of @a p,
-  *			then it will return 0.
+  * Divides polynomial @a dest by @a src and stores result back into @a dest.
+  * @note This division algorithm output is similar to integer division where the remainder is
+  *			*truncated*.
+  * @param[in,out]	dest	Pointer to dividend.
+  * @param[in]		src		Pointer to divisor.
+  * @return	Returns @a dest if successful. 0, otherwise.
   */
-double poly_getcoeff(polynomial const* p, size_t n);
+polynomial* poly_div(polynomial* dest, polynomial const* src);
 
 /**
   * Computes the polynomial @p at @a x.

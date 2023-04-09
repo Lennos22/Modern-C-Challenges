@@ -96,12 +96,24 @@ int main(int argc, char* argv[argc+1]) {
 	printf("Resizing testpoly back to 2nd degree: ");
 	poly_print(poly_resize(testpoly, 2));
 	putc('\n', stdout);
-
+#if 0
 	printf("Subtracting v from testpoly gives: ");
 	poly_print(poly_add(testpoly, vpoly));
+	putc('\n', stdout);
+#endif
+	
+	polynomial* testfactor = poly_new(1, (double[2]) { 1, 1 });
+	printf("Dividing testpoly by testfactor: ");
+	poly_print(testfactor);
+	putc('\n', stdout);
+
+	poly_div(testpoly, testfactor);
+	printf("Result is: ");
+	poly_print(testpoly);
 	putc('\n', stdout);
 
 	poly_delete(testpoly);
 	poly_delete(vpoly);
 	poly_delete(wpoly);
+	poly_delete(testfactor);
 }
