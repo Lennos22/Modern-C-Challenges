@@ -14,11 +14,11 @@
 
 double maxd(double a, double b);
 bool is_equald(double a, double b, double abs_eps, double rel_eps);
-bool is_zerod(double a, double abs_eps, double rel_eps);
+bool is_zerod(double a, double abs_eps);
 
 #ifndef __STDC_NO_COMPLEX__
 bool is_equalc(double complex a, double complex b, double abs_eps, double rel_eps);
-bool is_zeroc(double complex a, double abs_eps, double rel_eps);
+bool is_zeroc(double complex a, double abs_eps);
 void print_cmplx(double complex a);
 double complex strtocmplx(char const start[static 1]);
 #endif

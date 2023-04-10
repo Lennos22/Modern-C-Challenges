@@ -13,10 +13,10 @@
 
 #ifdef NAN
 static double poly_newton_raphson(polynomial const* p, double x_init, double abs_eps,
-		double rel_eps, size_t max_iters);
+		size_t max_iters);
 # ifndef __STDC_NO_COMPLEX__
 static double complex cpoly_newton_raphson(complex_polynomial const* cp, double complex z_init,
-		double abs_eps, double rel_eps, size_t max_iters);
+		double abs_eps, size_t max_iters);
 # endif
 #endif
 
@@ -41,7 +41,6 @@ struct complex_polynomial {
 #endif
 
 double const AbsEps = 1E-10;
-double const RelEps = 1E-08;
 size_t const MaxIters = 256;
 
 polynomial* poly_init(polynomial* p, size_t degree, double const coeff[degree+1]) {
@@ -60,7 +59,7 @@ polynomial* poly_init(polynomial* p, size_t degree, double const coeff[degree+1]
 		if (!p->coeff)
 			p = 0;
 	}
-	return poly_trim(p, AbsEps, RelEps);
+	return poly_trim(p, AbsEps);
 }
 
 polynomial* poly_new(size_t degree, double const coeff[degree+1]) {
@@ -102,13 +101,13 @@ assert(p);
 	return (n <= poly_getdegree(p)) ? p->coeff[n] : 0.0;
 }
 
-polynomial* poly_trim(polynomial* p, double abs_eps, double rel_eps) {
+polynomial* poly_trim(polynomial* p, double abs_eps) {
 	polynomial* ret = p;
 	if (p) {
 		size_t p_degree = poly_getdegree(p);
 		size_t i;
 		for (i = 0; i < p_degree; ++i) {	// No need to check if zeroth degree coeff is zero...
-			if (!is_zerod(poly_getcoeff(p, p_degree-i), abs_eps, rel_eps)) break;
+			if (!is_zerod(poly_getcoeff(p, p_degree-i), abs_eps)) break;
 		}
 		if (i)
 			ret = poly_resize(p, p_degree-i);
@@ -128,7 +127,7 @@ polynomial* poly_add(polynomial* dest, polynomial const* src) {
 		}
 		if (!vector_add(max_degree+1, dest->coeff, src->coeff))
 			return 0;
-		return poly_trim(dest, AbsEps, RelEps);
+		return poly_trim(dest, AbsEps);
 	}
 	return 0;
 }
@@ -138,7 +137,7 @@ polynomial* poly_mult(polynomial* dest, double k) {
 		if (!vector_mult(poly_getdegree(dest)+1, dest->coeff, k))
 			return 0;
 	}
-	return poly_trim(dest, AbsEps, RelEps);
+	return poly_trim(dest, AbsEps);
 }
 
 polynomial* poly_div(polynomial* dest, polynomial const* src) {
@@ -190,7 +189,7 @@ double poly_comp_deriv(polynomial const* p, double x) {
 
 #ifdef NAN
 double poly_findroot(polynomial const* p, double x_init) {
-	return poly_newton_raphson(p, x_init, AbsEps, RelEps, MaxIters);
+	return poly_newton_raphson(p, x_init, AbsEps, MaxIters);
 }
 
 void poly_printroots(polynomial const* p, double x_init) {
@@ -338,13 +337,13 @@ assert(cp);
 	return (n <= cpoly_getdegree(cp)) ? cp->coeff[n] : 0.0;
 }
 
-complex_polynomial* cpoly_trim(complex_polynomial* cp, double abs_eps, double rel_eps) {
+complex_polynomial* cpoly_trim(complex_polynomial* cp, double abs_eps) {
 	complex_polynomial* ret = cp;
 	if (cp) {
 		size_t cp_degree = cpoly_getdegree(cp);
 		size_t i;
 		for (i = 0; i < cp_degree; ++i) {	// No need to check if zeroth degree coeff is zero...
-			if (!is_zeroc(cpoly_getcoeff(cp, cp_degree-i), abs_eps, rel_eps)) break;
+			if (!is_zeroc(cpoly_getcoeff(cp, cp_degree-i), abs_eps)) break;
 		}
 		if (i)
 			ret = cpoly_resize(cp, cp_degree-i);
@@ -364,7 +363,7 @@ complex_polynomial* cpoly_add(complex_polynomial* dest, complex_polynomial const
 		}
 		if (!cvector_add(max_degree+1, dest->coeff, src->coeff))
 			return 0;
-		return cpoly_trim(dest, AbsEps, RelEps);
+		return cpoly_trim(dest, AbsEps);
 	}
 	return 0;
 }
@@ -374,7 +373,7 @@ complex_polynomial* cpoly_mult(complex_polynomial* dest, double complex k) {
 		if (!cvector_mult(cpoly_getdegree(dest)+1, dest->coeff, k))
 			return 0;
 	}
-	return cpoly_trim(dest, AbsEps, RelEps);
+	return cpoly_trim(dest, AbsEps);
 }
 
 complex_polynomial* cpoly_div(complex_polynomial* dest, complex_polynomial const* src) {
@@ -426,7 +425,7 @@ double complex cpoly_comp_deriv(complex_polynomial const* cp, double complex z) 
 
 #ifdef NAN
 double complex cpoly_findroot(complex_polynomial const* cp, double complex z_init) {
-	return cpoly_newton_raphson(cp, z_init, AbsEps, RelEps, MaxIters);
+	return cpoly_newton_raphson(cp, z_init, AbsEps, MaxIters);
 }
 
 void cpoly_getroots(complex_polynomial const* cp, double complex z_init,
@@ -517,10 +516,10 @@ void cpoly_print_func(complex_polynomial const* p) {
 
 #ifdef NAN
 static double poly_newton_raphson(polynomial const* p, double x_init, double abs_eps,
-		double rel_eps, size_t max_iters) {
+		size_t max_iters) {
 	double ans = x_init;
 	size_t i = 0;
-	while (!is_zerod(polynomial_compute(p, ans), abs_eps, rel_eps) && i < max_iters) {
+	while (!is_zerod(polynomial_compute(p, ans), abs_eps) && i < max_iters) {
 		ans -= polynomial_compute(p, ans)/poly_comp_deriv(p, ans);
 		++i;
 	}
@@ -535,12 +534,12 @@ static double poly_newton_raphson(polynomial const* p, double x_init, double abs
 
 # ifndef __STDC_NO_COMPLEX__
 static double complex cpoly_newton_raphson(complex_polynomial const* cp, double complex z_init,
-		double abs_eps, double rel_eps, size_t max_iters) {
+		double abs_eps, size_t max_iters) {
 	if (!cp) return NAN;
 	double complex ans = z_init;
 	size_t i = 0;
-	while (!is_zeroc(complex_polynomial_compute(cp, ans), abs_eps, rel_eps) && i < max_iters) {
-# ifndef NDEBUG
+	while (!is_zeroc(complex_polynomial_compute(cp, ans), abs_eps) && i < max_iters) {
+#  ifndef NDEBUG
 		printf("ans = ");
 		print_cmplx(ans);
 		printf(" cp(ans) = ");
@@ -548,11 +547,11 @@ static double complex cpoly_newton_raphson(complex_polynomial const* cp, double 
 		printf(" cp'(ans) = ");
 		print_cmplx(cpoly_comp_deriv(cp, ans));
 		putc('\n', stdout);
-# endif
+#  endif
 		ans -= complex_polynomial_compute(cp, ans)/cpoly_comp_deriv(cp, ans);
 		++i;
 	}
-# ifndef NDEBUG
+#  ifndef NDEBUG
 	if (i >= max_iters)
 		fprintf(stderr, "Passed max no. of iterations (%zu/%zu)\n", i, max_iters);
 	else {
@@ -560,7 +559,7 @@ static double complex cpoly_newton_raphson(complex_polynomial const* cp, double 
 		print_cmplx(ans);
 		printf(" reached after %zu iterations!\n", i);
 	}
-# endif
+#  endif
 	return (i >= max_iters) ? NAN : ans;
 }
 # endif

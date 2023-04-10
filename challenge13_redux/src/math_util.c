@@ -24,9 +24,9 @@ assert(isfinite(b));
 	return dist < rel_eps*maxd(a, b);
 }
 
-bool is_zerod(double a, double abs_eps, double rel_eps) {
+bool is_zerod(double a, double abs_eps) {
 assert(isfinite(a));
-	return is_equald(a, 0, abs_eps, rel_eps);
+	return fabs(a) < abs_eps;
 }
 
 #ifndef __STDC_NO_COMPLEX__
@@ -37,9 +37,9 @@ assert(isfinite(creal(b)) && isfinite(cimag(b)));
 		&& is_equald(cimag(a), cimag(b), abs_eps, rel_eps);
 }
 
-bool is_zeroc(double complex a, double abs_eps, double rel_eps) {
+bool is_zeroc(double complex a, double abs_eps) {
 assert(isfinite(creal(a)) && isfinite(cimag(a)));
-	return is_zerod(creal(a), abs_eps, rel_eps) && is_zerod(cimag(a), abs_eps, rel_eps);
+	return is_zerod(creal(a), abs_eps) && is_zerod(cimag(a), abs_eps);
 }
 
 void print_cmplx(double complex a) {
@@ -71,4 +71,5 @@ double complex strtocmplx(char const start[static 1]) {
 # endif
 	return ret;
 }
+
 #endif

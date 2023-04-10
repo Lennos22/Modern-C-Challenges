@@ -102,7 +102,7 @@ int main(int argc, char* argv[argc+1]) {
 	putc('\n', stdout);
 
 	printf("Resizing testpoly back to 2nd degree: ");
-	poly_print_vec(poly_trim(testpoly, 1E-10, 1E-08));
+	poly_print_vec(poly_trim(testpoly, 1E-10));
 	putc('\n', stdout);
 #if 0
 	printf("Subtracting v from testpoly gives: ");
