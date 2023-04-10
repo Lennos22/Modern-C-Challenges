@@ -9,8 +9,13 @@
 #define POLYNOMIAL_H
 
 #include <stddef.h>
+#include <complex.h>
 
 typedef struct polynomial polynomial;
+
+#ifndef __STDC_NO_COMPLEX__
+typedef struct complex_polynomial complex_polynomial;
+#endif
 
 /**
   * Initialize polynomial object @p.
@@ -73,6 +78,13 @@ size_t poly_getdegree(polynomial const* p);
   *			then it will return 0.
   */
 double poly_getcoeff(polynomial const* p, size_t n);
+
+/**
+  * Determines the actual degree of polynomial @a p and resizes it accordingly.
+  *
+  * Uses @a abs_eps and @a rel_eps to determine whether a coefficient is effectively zero.
+  */
+polynomial* poly_trim(polynomial* p, double abs_eps, double rel_eps);
 
 /**
   * Adds two polynomials, @a dest and @a src, together and stores result in @a dest.size
@@ -150,5 +162,22 @@ void poly_print_vec(polynomial const* p);
   * @param[in]	p	Pointer to the polynomial object.
   */
 void poly_print_func(polynomial const* p);
+
+#ifndef __STDC_NO_COMPLEX__
+complex_polynomial* cpoly_init(complex_polynomial* cp, size_t degree,
+		double complex const coeff[degree+1]);
+complex_polynomial* cpoly_new(size_t degree, double complex const coeff[degree+1]);
+void cpoly_delete(complex_polynomial* cp);
+complex_polynomial* cpoly_resize(complex_polynomial* cp, size_t new_degree);
+size_t cpoly_getdegree(complex_polynomial const* cp);
+double complex cpoly_getcoeff(complex_polynomial const* cp, size_t n);
+complex_polynomial* cpoly_trim(complex_polynomial* cp, double abs_eps, double rel_eps);
+complex_polynomial* cpoly_add(complex_polynomial* dest, complex_polynomial const* src);
+complex_polynomial* cpoly_mult(complex_polynomial* dest, double complex k);
+double complex complex_polynomial_compute(complex_polynomial const* cp, double complex z);
+double complex cpoly_comp_deriv(complex_polynomial const* cp, double complex z);
+double complex cpoly_findroot(complex_polynomial const* cp, double complex z_init);
+void cpoly_print_func(complex_polynomial const* cp);
+#endif
 
 #endif

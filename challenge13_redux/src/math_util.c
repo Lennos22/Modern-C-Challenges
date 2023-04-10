@@ -26,3 +26,17 @@ bool is_zerod(double a, double abs_eps, double rel_eps) {
 assert(isfinite(a));
 	return is_equald(a, 0, abs_eps, rel_eps);
 }
+
+#ifndef __STDC_NO_COMPLEX__
+bool is_equalc(double complex a, double complex b, double abs_eps, double rel_eps) {
+assert(isfinite(creal(a)) && isfinite(cimag(a)));
+assert(isfinite(creal(b)) && isfinite(cimag(b)));
+	return is_equald(creal(a), creal(b), abs_eps, rel_eps)
+		&& is_equald(cimag(a), cimag(b), abs_eps, rel_eps);
+}
+
+bool is_zeroc(double complex a, double abs_eps, double rel_eps) {
+assert(isfinite(creal(a)) && isfinite(cimag(a)));
+	return is_zerod(creal(a), abs_eps, rel_eps) && is_zerod(cimag(a), abs_eps, rel_eps);
+}
+#endif

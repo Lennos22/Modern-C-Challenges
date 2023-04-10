@@ -102,7 +102,7 @@ int main(int argc, char* argv[argc+1]) {
 	putc('\n', stdout);
 
 	printf("Resizing testpoly back to 2nd degree: ");
-	poly_print_vec(poly_resize(testpoly, 2));
+	poly_print_vec(poly_trim(testpoly, 1E-10, 1E-08));
 	putc('\n', stdout);
 #if 0
 	printf("Subtracting v from testpoly gives: ");
@@ -124,7 +124,17 @@ int main(int argc, char* argv[argc+1]) {
 	printf("Finding a root of testpoly at x = %g\n", x_in);
 	printf("A root of testpoly is: %g\n", poly_findroot(testpoly, x_in));
 
+	printf("Subtracting testpoly from itself gives: ");
+	polynomial* testcpy = poly_copy(testpoly);
+	poly_print_vec(poly_add(testpoly, poly_mult(testcpy, -1)));
+	putc('\n', stdout);
+
+	printf("Mulitplying v by 0 gives: ");
+	poly_print_vec(poly_mult(vpoly, 0));
+	putc('\n', stdout);
+
 	poly_delete(testpoly);
+	poly_delete(testcpy);
 	poly_delete(vpoly);
 	poly_delete(wpoly);
 }

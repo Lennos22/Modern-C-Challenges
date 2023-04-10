@@ -5,6 +5,9 @@
 #define VECTOR_H
 
 #include <stddef.h>
+#ifndef __STDC_NO_COMPLEX__
+# include <complex.h>
+#endif
 
 /**
   * Adds two vectors, @a dest and @a src, and stores result in @a dest.
@@ -38,5 +41,14 @@ double vector_dotproduct(size_t nelem, double const v[nelem], double const w[nel
   * @param[in]	v		The vector to print.
   */
 void vector_print(size_t nelem, double const v[nelem]);
+
+#ifndef __STDC_NO_COMPLEX__
+double complex* cvector_add(size_t nelem, double complex dest[nelem],
+		double complex const src[nelem]);
+double complex* cvector_mult(size_t nelem, double complex dest[nelem], double complex k);
+double complex cvector_dotproduct(size_t nelem, double complex const v[nelem],
+		double complex const w[nelem]);
+void cvector_print(size_t nelem, double complex const v[nelem]);
+#endif
 
 #endif
