@@ -52,6 +52,13 @@ void poly_delete(polynomial* p);
 polynomial* poly_resize(polynomial* p, size_t new_degree);
 
 /**
+  * Copies a polynomial @a src.
+  * @param[in]	src	Pointer to the polynomial object.
+  * @return	Pointer to the copy of @a src if successful. 0, otherwise.
+  */
+polynomial* poly_copy(polynomial const* src);
+
+/**
   * Gets the degree of polynomial @a p.
   * @param[in]	p	Pointer to the polynomial object.
   * @return	The degree of polynomial @a p.
@@ -111,16 +118,37 @@ double poly_comp_deriv(polynomial const* p, double x);
 
 /**
   * Finds a root of polynomial @a p based on an initial guess @a x.
+  * @note uses the [Newton-Raphson method] to calculate a root of @a p. This method requires an
+  *			initial guess, specified by @a x_init.
   * @param[in]	p		Pointer to the polynomial object.
-  * @param[in]	x_init	Initial guess.
+  * @param[in]	x_init	Initial guess for root of @a p.
   * @return	A root closest to @a x_init. If unable to find root, will return NAN.
+  *
+  * [newton-raphson method]: https://en.wikipedia.org/wiki/Newton%27s_method
   */
 double poly_findroot(polynomial const* p, double x_init);
+
+/**
+  * Prints out all the *real* roots of polynomial @a p.
+  * @note uses the [Newton-Raphson method] to calculate the roots of @a p. This method requires an
+  *			initial guess, specified by @a x_init.
+  * @param[in]	p		Pointer to the polynomial object.
+  * @param[in]	x_init	Initial guess for root of @a p.
+  *
+  * [newton-raphson method]: https://en.wikipedia.org/wiki/Newton%27s_method
+  */
+void poly_printroots(polynomial const* p, double x_init);
 
 /**
   * Prints the coefficients of polynomial @a p in vector form.
   * @param[in]	p	Pointer to the polynomial object.
   */
-void poly_print(polynomial const* p);
+void poly_print_vec(polynomial const* p);
+
+/**
+  * Prints the polynomial @a p in function form.
+  * @param[in]	p	Pointer to the polynomial object.
+  */
+void poly_print_func(polynomial const* p);
 
 #endif

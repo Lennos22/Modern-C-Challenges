@@ -27,7 +27,7 @@ int main(int argc, char* argv[argc+1]) {
 	printf("Initialized testpoly with degree %zu\n", poly_getdegree(testpoly));
 
 	printf("testpoly elements are:\n");
-	poly_print(testpoly);
+	poly_print_vec(testpoly);
 	putc('\n', stdout);
 
 	printf("Testing poly_getcoeff():\n");
@@ -44,11 +44,11 @@ int main(int argc, char* argv[argc+1]) {
 	if (!poly_resize(testpoly, 10))
 		fprintf(stderr, "p is invalid...\n");
 	printf("testpoly is now %zuth degree and its elements are:\n", poly_getdegree(testpoly));
-	poly_print(testpoly);
+	poly_print_vec(testpoly);
 	putc('\n', stdout);
 
 	printf("Printing null poly:\n");
-	poly_print(0);
+	poly_print_vec(0);
 	putc('\n', stdout);
 
 	double v[5] = {3.2, -20, .999, 1, 0};
@@ -83,40 +83,40 @@ int main(int argc, char* argv[argc+1]) {
 	polynomial* wpoly = poly_new(4, w);
 
 	printf("Polynomial v is: ");
-	poly_print(vpoly);
+	poly_print_vec(vpoly);
 	putc('\n', stdout);
 	printf("Polynomial w is: ");
-	poly_print(wpoly);
+	poly_print_vec(wpoly);
 	putc('\n', stdout);
 
 	printf("Adding v into w gives: ");
-	poly_print(poly_add(wpoly, vpoly));
+	poly_print_vec(poly_add(wpoly, vpoly));
 	putc('\n', stdout);
 
 	printf("Multipliying w by 3.14 gives: ");
-	poly_print(poly_mult(wpoly, 3.14));
+	poly_print_vec(poly_mult(wpoly, 3.14));
 	putc('\n', stdout);
 
 	printf("Subtracting v from (1/3.14)w gives: ");
-	poly_print(poly_add(poly_mult(wpoly, 1.0/3.14), poly_mult(vpoly, -1)));
+	poly_print_vec(poly_add(poly_mult(wpoly, 1.0/3.14), poly_mult(vpoly, -1)));
 	putc('\n', stdout);
 
 	printf("Resizing testpoly back to 2nd degree: ");
-	poly_print(poly_resize(testpoly, 2));
+	poly_print_vec(poly_resize(testpoly, 2));
 	putc('\n', stdout);
 #if 0
 	printf("Subtracting v from testpoly gives: ");
-	poly_print(poly_add(testpoly, vpoly));
+	poly_print_vec(poly_add(testpoly, vpoly));
 	putc('\n', stdout);
 	
 	polynomial* testfactor = poly_new(1, (double[2]) { 1, 1 });
 	printf("Dividing testpoly by testfactor: ");
-	poly_print(testfactor);
+	poly_print_vec(testfactor);
 	putc('\n', stdout);
 
 	poly_div(testpoly, testfactor);
 	printf("Result is: ");
-	poly_print(testpoly);
+	poly_print_vec(testpoly);
 	putc('\n', stdout);
 	poly_delete(testfactor);
 #endif

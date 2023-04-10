@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <errno.h>
 #include <tgmath.h>
 
 /**
@@ -68,6 +69,11 @@ polynomial* poly_resize(polynomial* p, size_t new_degree) {
 		p->degree = new_degree;
 		p->coeff = new_coeff;
 	}
+	return p;
+}
+
+polynomial* poly_copy(polynomial const* src) {
+	polynomial* p = poly_new(poly_getdegree(src), src->coeff);
 	return p;
 }
 
@@ -153,15 +159,95 @@ double poly_comp_deriv(polynomial const* p, double x) {
 	return ret;
 }
 
+#ifdef NAN
 double poly_findroot(polynomial const* p, double x_init) {
 	return poly_newton_raphson(p, x_init, AbsEps, RelEps, MaxIters);
 }
 
-void poly_print(polynomial const* p) {
-	if (p)
+void poly_printroots(polynomial const* p, double x_init) {
+#ifndef NDEBUG
+	printf("Calculating roots of polynomial: ");
+	poly_print_func(p);
+	putc('\n', stdout);
+	printf("Using initial guess of: %g\n", x_init);
+#endif
+	polynomial* p_cpy = poly_copy(p);
+	double roots[poly_getdegree(p)];
+	size_t num_roots;
+
+	for (num_roots = 0; num_roots < poly_getdegree(p); ++num_roots) {
+		double root = poly_findroot(p_cpy, x_init);
+
+		if (!isfinite(root)) {
+			if (!num_roots) {
+				printf("Could not find any roots in polynomial. Initial guess may have hit a non-zero "
+						"stationary point\n");
+				return;
+			}
+			break;
+		}
+		polynomial* factor = poly_new(1, (double[2]) { -root, 1 });
+		if (!factor) {
+			fprintf(stderr, "ERROR: could not allocate memory for factor...\n");
+			perror(0);
+			errno = 0;
+			return;
+		}
+
+		roots[num_roots] = root;
+		poly_div(p_cpy, factor);
+		x_init = root;
+#ifndef NDEBUG
+		printf("Factor found: ");
+		poly_print_func(factor);
+		putc('\n', stdout);
+		printf("p_cpy is now: ");
+		poly_print_func(p_cpy);
+		putc('\n', stdout);
+		printf("New initial guess is now: %g\n", x_init);
+#endif
+		poly_delete(factor);
+	}
+	if (num_roots == 1)
+		printf("Found 1 root:\n");
+	else
+		printf("Found %zu roots:\n", num_roots);
+	for (size_t i = 0; i < num_roots; ++i) {
+		printf("%g", roots[i]);
+		if (i < num_roots-1)
+			printf(", ");
+	}
+	putc('\n', stdout);
+	poly_delete(p_cpy);
+}
+#endif
+
+void poly_print_vec(polynomial const* p) {
+	if (p && p->coeff)
 		vector_print(poly_getdegree(p)+1, p->coeff);
 	else
-		vector_print(0, 0);
+		printf("Invalid Polynomial...");
+}
+
+void poly_print_func(polynomial const* p) {
+	if (p && p->coeff) {
+		size_t p_degree = poly_getdegree(p);
+		for (size_t i = 0; i <= p_degree; ++i) {
+			double coeff = poly_getcoeff(p, p_degree-i);
+			if (!i)
+				printf((coeff < 0) ? "-" : "");
+			else
+				printf((coeff < 0) ? "- " : "+ ");
+			printf("%g", fabs(coeff));
+			if (i == p_degree) continue;
+			putc('x', stdout);
+			if (i < p_degree-1)
+				printf("^%zu", p_degree-i);
+			putc(' ', stdout);
+		}
+
+	} else
+		printf("Invalid Polynomial...");
 }
 
 #ifdef NAN

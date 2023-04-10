@@ -3,7 +3,7 @@
 ####################################################################################################
 
 # Directory/filename strings
-TARGETS		:= test_polynomial
+TARGETS		:= poly_rootfinder test_polynomial
 
 BUILD_DIR	:= ./build
 SRC_DIR		:= ./src
@@ -13,9 +13,13 @@ SRC_FILES	:= $(shell find $(SRC_DIR) -name *.c -or -name *.s)
 OBJ_FILES	:= $(SRC_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 DEP_FILES	:= $(OBJ_FILES:.o=.d)
 
+TARGET_OBJS	:= $(TARGETS:%=$(BUILD_DIR)/%.o)
+
 # Shell strings
 STDC		:= -std=c11
 HARDMODE	:= -Wextra -Werror -pedantic-errors
+DEFINES		:= NDEBUG
+DEF_FLAGS	:= $(addprefix -D,$(DEFINES))
 INC_FLAGS	:= $(addprefix -I,$(INC_DIRS))
 
 DEBUG		:= -Wall $(HARDMODE)
@@ -26,7 +30,7 @@ DIR_GUARD	= @mkdir -p $(@D)
 # Makefile flags
 CC			:= gcc
 CFLAGS		:= $(STDC) $(DEBUG)
-CPPFLAGS	:= $(INC_FLAGS) -MMD -MP
+CPPFLAGS	:= $(DEF_FLAGS) $(INC_FLAGS) -MMD -MP
 LDLIBS		:= -lm
 
 ####################################################################################################
@@ -36,8 +40,12 @@ LDLIBS		:= -lm
 .PHONY: all
 all: $(TARGETS)
 
+test:
+	echo $(TARGET_OBJS)
+	echo $(filter-out $(TARGET_OBJS),$(OBJ_FILES))
+
 # Executables
-$(TARGETS): $(OBJ_FILES)
+$(TARGETS): %: $(BUILD_DIR)/%.o $(filter-out $(TARGET_OBJS),$(OBJ_FILES))
 	$(LINK.o) $^ $(LDLIBS) -o $@
 
 # Object Files
