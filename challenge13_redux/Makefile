@@ -3,7 +3,7 @@
 ####################################################################################################
 
 # Directory/filename strings
-TARGETS		:= poly_rootfinder test_polynomial testcmplx_poly
+TARGETS		:= poly_rootfinder poly_cmplxrootfinder test_polynomial testcmplx_poly
 
 BUILD_DIR	:= ./build
 SRC_DIR		:= ./src
@@ -18,7 +18,7 @@ TARGET_OBJS	:= $(TARGETS:%=$(BUILD_DIR)/%.o)
 # Shell strings
 STDC		:= -std=c11
 HARDMODE	:= -Wextra -Werror -pedantic-errors
-DEFINES		:=
+DEFINES		:= NDEBUG
 DEF_FLAGS	:= $(addprefix -D,$(DEFINES))
 INC_FLAGS	:= $(addprefix -I,$(INC_DIRS))
 

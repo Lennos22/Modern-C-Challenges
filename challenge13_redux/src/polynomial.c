@@ -255,7 +255,7 @@ void poly_print_vec(polynomial const* p) {
 	if (p && p->coeff)
 		vector_print(poly_getdegree(p)+1, p->coeff);
 	else
-		printf("Invalid Polynomial...");
+		printf("Invalid polynomial...");
 }
 
 void poly_print_func(polynomial const* p) {
@@ -276,7 +276,7 @@ void poly_print_func(polynomial const* p) {
 		}
 
 	} else
-		printf("Invalid Polynomial...");
+		fprintf(stderr, "Invalid polynomial...");
 }
 
 #ifndef __STDC_NO_COMPLEX__
@@ -320,6 +320,11 @@ complex_polynomial* cpoly_resize(complex_polynomial* cp, size_t new_degree) {
 		cp->degree = new_degree;
 		cp->coeff = new_coeff;
 	}
+	return cp;
+}
+
+complex_polynomial* cpoly_copy(complex_polynomial const* src) {
+	complex_polynomial* cp = cpoly_new(cpoly_getdegree(src), src->coeff);
 	return cp;
 }
 
@@ -372,6 +377,34 @@ complex_polynomial* cpoly_mult(complex_polynomial* dest, double complex k) {
 	return cpoly_trim(dest, AbsEps, RelEps);
 }
 
+complex_polynomial* cpoly_div(complex_polynomial* dest, complex_polynomial const* src) {
+	if (dest && src) {
+		size_t dest_degree = cpoly_getdegree(dest);
+		size_t src_degree = cpoly_getdegree(src);
+		if (dest_degree < src_degree)
+			return 0;
+		size_t quot_degree = dest_degree - src_degree;
+		double complex* quot_coeff = malloc((quot_degree+1)*sizeof(double complex));
+		if (!quot_coeff)
+			return 0;
+
+		for (size_t i = 0; i <= quot_degree; ++i) {
+			quot_coeff[quot_degree-i] = dest->coeff[dest_degree-i]/src->coeff[src_degree];
+			for (size_t j = 0; j <= src_degree; ++j) {
+				dest->coeff[dest_degree-i-j] -= quot_coeff[quot_degree-i]
+					* src->coeff[src_degree-j];
+			}
+		}
+
+		free(dest->coeff);
+		dest->degree = quot_degree;
+		dest->coeff = quot_coeff;
+		
+		return dest;
+	}
+	return 0;
+}
+
 double complex complex_polynomial_compute(complex_polynomial const* cp, double complex z) {
 	double complex ret = 0.0;
 	if (cp) {
@@ -395,7 +428,67 @@ double complex cpoly_comp_deriv(complex_polynomial const* cp, double complex z) 
 double complex cpoly_findroot(complex_polynomial const* cp, double complex z_init) {
 	return cpoly_newton_raphson(cp, z_init, AbsEps, RelEps, MaxIters);
 }
+
+void cpoly_getroots(complex_polynomial const* cp, double complex z_init,
+		double complex res[cpoly_getdegree(cp)]) {
+# ifndef NDEBUG
+	printf("Calculating roots of complex polynomial: ");
+	cpoly_print_func(cp);
+	putc('\n', stdout);
+	printf("Using initial guess of: ");
+	print_cmplx(z_init);
+	putc('\n', stdout);
+# endif
+	complex_polynomial* cp_cpy = cpoly_copy(cp);
+	double complex roots[cpoly_getdegree(cp)];
+	size_t num_roots;
+
+	for (num_roots = 0; num_roots < cpoly_getdegree(cp); ++num_roots) {
+		double complex root = cpoly_findroot(cp_cpy, z_init);
+
+		if (!isfinite(creal(root)) || !isfinite(cimag(root))) {
+			fprintf(stderr, "ERROR: stopped after %zuth iteration, initial guess may be \n", num_roots);
+			fprintf(stderr, "non-zero stationary point or root too large\n");
+			break;
+		}
+		complex_polynomial* factor = cpoly_new(1, (double complex[2]) { -root, 1 });
+		if (!factor) {
+			fprintf(stderr, "ERROR: could not allocate memory for factor...\n");
+			perror(0);
+			errno = 0;
+			return;
+		}
+
+		roots[num_roots] = root;
+		cpoly_div(cp_cpy, factor);
+		z_init = root;
+# ifndef NDEBUG
+		printf("Factor found: ");
+		cpoly_print_func(factor);
+		putc('\n', stdout);
+		printf("cp_cpy is now: ");
+		cpoly_print_func(cp_cpy);
+		putc('\n', stdout);
+		printf("New initial guess is now: ");
+		print_cmplx(z_init);
+		putc('\n', stdout);
+# endif
+		cpoly_delete(factor);
+	}
+	cpoly_delete(cp_cpy);
+	if (res) {
+		for (size_t i = 0; i < cpoly_getdegree(cp); ++i)
+			res[i] = roots[i];
+	}
+}
 #endif
+
+void cpoly_print_vec(complex_polynomial const* cp) {
+	if (cp && cp->coeff) 
+		cvector_print(cpoly_getdegree(cp)+1, cp->coeff);
+	else
+		fprintf(stderr, "Invalid polynomial...");
+}
 
 void cpoly_print_func(complex_polynomial const* p) {
 	if (p && p->coeff) {
@@ -404,12 +497,9 @@ void cpoly_print_func(complex_polynomial const* p) {
 			double complex coeff = cpoly_getcoeff(p, cp_degree-i);
 			if (i)
 				printf(" + ");
-			printf("(%g", creal(coeff));
-			if (cimag(coeff) < 0)
-				putc('-', stdout);
-			else
-				putc('+', stdout);
-			printf("%gi)", fabs(cimag(coeff)));
+			putc('(', stdout);
+			print_cmplx(coeff);
+			putc(')', stdout);
 			if (i == cp_degree) continue;
 			putc('z', stdout);
 			if (i < cp_degree-1)
@@ -417,7 +507,7 @@ void cpoly_print_func(complex_polynomial const* p) {
 		}
 
 	} else
-		printf("Invalid complex polynomial...");
+		fprintf(stderr, "Invalid complex polynomial...");
 }
 #endif
 
@@ -434,6 +524,12 @@ static double poly_newton_raphson(polynomial const* p, double x_init, double abs
 		ans -= polynomial_compute(p, ans)/poly_comp_deriv(p, ans);
 		++i;
 	}
+# ifndef NDEBUG
+	if (i >= max_iters)
+		fprintf(stderr, "Passed max no. of iterations (%zu/%zu)\n", i, max_iters);
+	else
+		fprintf(stderr, "Zero x = %g reached after %zu iterations!\n", ans, i);
+# endif
 	return (!p || i >= max_iters) ? NAN : ans;
 }
 
@@ -444,9 +540,27 @@ static double complex cpoly_newton_raphson(complex_polynomial const* cp, double 
 	double complex ans = z_init;
 	size_t i = 0;
 	while (!is_zeroc(complex_polynomial_compute(cp, ans), abs_eps, rel_eps) && i < max_iters) {
+# ifndef NDEBUG
+		printf("ans = ");
+		print_cmplx(ans);
+		printf(" cp(ans) = ");
+		print_cmplx(complex_polynomial_compute(cp, ans));
+		printf(" cp'(ans) = ");
+		print_cmplx(cpoly_comp_deriv(cp, ans));
+		putc('\n', stdout);
+# endif
 		ans -= complex_polynomial_compute(cp, ans)/cpoly_comp_deriv(cp, ans);
 		++i;
 	}
+# ifndef NDEBUG
+	if (i >= max_iters)
+		fprintf(stderr, "Passed max no. of iterations (%zu/%zu)\n", i, max_iters);
+	else {
+		printf("Zero z = ");
+		print_cmplx(ans);
+		printf(" reached after %zu iterations!\n", i);
+	}
+# endif
 	return (i >= max_iters) ? NAN : ans;
 }
 # endif

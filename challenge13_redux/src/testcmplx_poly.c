@@ -6,12 +6,11 @@
 #endif
 #include "polynomial.h"
 #include "vector.h"
+#include "math_util.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <tgmath.h>
-
-static double complex strtocmplx(char const str[static 1]);
 
 int main(int argc, char* argv[argc+1]) {
 	complex_polynomial* testpoly;
@@ -26,6 +25,8 @@ int main(int argc, char* argv[argc+1]) {
 	if (!testpoly)
 		return EXIT_FAILURE;
 	cpoly_print_func(testpoly);
+	putc('\n', stdout);
+	cpoly_print_vec(testpoly);
 	putc('\n', stdout);
 
 	double complex v[] = {-1, 3-2*I, 10};
@@ -60,42 +61,38 @@ int main(int argc, char* argv[argc+1]) {
 
 	cpoly_mult(testpoly, -1);
 
-	printf("testpoly(10i) = %g + %gi\n", creal(complex_polynomial_compute(testpoly, 10*I)),
-				cimag(complex_polynomial_compute(testpoly, 10*I)));
-	printf("testpoly'(10i) = %g + %gi\n", creal(cpoly_comp_deriv(testpoly, 10*I)),
-				cimag(cpoly_comp_deriv(testpoly, 10*I)));
+	printf("testpoly(10i) = ");
+	print_cmplx(complex_polynomial_compute(testpoly, 10*I));
+	putc('\n', stdout);
+	printf("testpoly'(10i) = ");
+	print_cmplx(cpoly_comp_deriv(testpoly, 10*I));
+	putc('\n', stdout);
 
-	printf("One root of testpoly is: %g + %gi\n", creal(cpoly_findroot(testpoly, 10*I)),\
-			cimag(cpoly_findroot(testpoly, 10*I)));
+	printf("One root of testpoly is: ");
+	print_cmplx(cpoly_findroot(testpoly, 10*I));
+	putc('\n', stdout);
+
+	printf("Copying v, w and testpoly\n");
+	complex_polynomial* vcpy = cpoly_copy(vpoly);
+	complex_polynomial* wcpy = cpoly_copy(wpoly);
+	complex_polynomial* testcpy = cpoly_copy(testpoly);
+
+	printf("v copy is: ");
+	cpoly_print_vec(vcpy);
+	putc('\n', stdout);
+	printf("w copy is: ");
+	cpoly_print_vec(wcpy);
+	putc('\n', stdout);
+	printf("testpoly copy is: ");
+	cpoly_print_vec(testcpy);
+	putc('\n', stdout);
 
 	cpoly_delete(testpoly);
 	cpoly_delete(vpoly);
 	cpoly_delete(wpoly);
+	cpoly_delete(vcpy);
+	cpoly_delete(wcpy);
+	cpoly_delete(testcpy);
 
 	return EXIT_SUCCESS;
-}
-
-static double complex strtocmplx(char const start[static 1]) {
-	double complex ret = 0.0;
-	if (start) {
-		char* end = 0;
-		double real = strtod(start, &end);
-#ifndef NDEBUG
-		printf("end string is: %s\n", end);
-#endif
-		if (start == end) return ret;
-		if (*end == 'i') return real*I;
-		ret += real;
-		start = end;
-		double imag = strtod(start, &end);
-#ifndef NDEBUG
-		printf("imag is %g and end char is: %c\n", imag, *end);
-#endif
-		if (*end != 'i') return ret;
-		ret += imag*I;
-	}
-#ifndef NDEBUG
-	printf("Re(ret) = %g; Im(ret) = %g\n", creal(ret), cimag(ret));
-#endif
-	return ret;
 }

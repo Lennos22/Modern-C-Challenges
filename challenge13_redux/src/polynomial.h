@@ -169,14 +169,19 @@ complex_polynomial* cpoly_init(complex_polynomial* cp, size_t degree,
 complex_polynomial* cpoly_new(size_t degree, double complex const coeff[degree+1]);
 void cpoly_delete(complex_polynomial* cp);
 complex_polynomial* cpoly_resize(complex_polynomial* cp, size_t new_degree);
+complex_polynomial* cpoly_copy(complex_polynomial const* src);
 size_t cpoly_getdegree(complex_polynomial const* cp);
 double complex cpoly_getcoeff(complex_polynomial const* cp, size_t n);
 complex_polynomial* cpoly_trim(complex_polynomial* cp, double abs_eps, double rel_eps);
 complex_polynomial* cpoly_add(complex_polynomial* dest, complex_polynomial const* src);
 complex_polynomial* cpoly_mult(complex_polynomial* dest, double complex k);
+complex_polynomial* cpoly_div(complex_polynomial* dest, complex_polynomial const* src);
 double complex complex_polynomial_compute(complex_polynomial const* cp, double complex z);
 double complex cpoly_comp_deriv(complex_polynomial const* cp, double complex z);
 double complex cpoly_findroot(complex_polynomial const* cp, double complex z_init);
+void cpoly_getroots(complex_polynomial const* cp, double complex z_init,
+		double complex res[cpoly_getdegree(cp)]);
+void cpoly_print_vec(complex_polynomial const* cp);
 void cpoly_print_func(complex_polynomial const* cp);
 #endif
 

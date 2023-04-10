@@ -15,22 +15,29 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <tgmath.h>
 
 int main(int argc, char* argv[argc+1]) {
 	if (argc < 2) {
-		fprintf(stderr, "Program args:  coefficients..., x_initial\n");
-		fprintf(stderr, "coefficients.. are the coefficients of polynomial: ax^n + bx^(n-1) + "
+		fprintf(stderr, "Program args: coefficients..., x_initial\n");
+		fprintf(stderr, "coefficients... are the coefficients of polynomial: ax^n + bx^(n-1) + "
 				"cx^(n-2) + ...\n");
 		fprintf(stderr, "listed in the form: a, b, c, ...\n");
 		fprintf(stderr, "x_initial is the initial guess of one of the roots of the polynomial\n");
 		
-		return EXIT_SUCCESS;
+		return EXIT_FAILURE;
 	}
-	double usr_inp[argc-2];
+	double coeff[argc-2];
 	for (int i = 1; i < argc-1; ++i)
-		usr_inp[argc-2-i] = strtod(argv[i], 0);
-	polynomial* p = poly_new(argc-3, usr_inp);
+		coeff[argc-2-i] = strtod(argv[i], 0);
+	polynomial* p = poly_new(argc-3, coeff);
+	if (!p) {
+		fprintf(stderr, "ERROR: failed to allocate memory for p\n");
+		perror(0);
+		errno = 0;
+		return EXIT_FAILURE;
+	}
 	double x_init = strtod(argv[argc-1], 0);
 	printf("Finding roots of polynomial: ");
 	poly_print_func(p);

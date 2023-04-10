@@ -2,6 +2,7 @@
  * Creatione Date/Time: 03-04-23/19:38
  */
 #include "vector.h"
+#include "math_util.h"
 
 #include <stdio.h>
 #include <tgmath.h>
@@ -83,12 +84,7 @@ void cvector_print(size_t nelem, double complex const v[nelem]) {
 	putc('[', stdout);
 	if (v) {
 		for (size_t i = 0; i < nelem; ++i) {
-			printf("%g", creal(v[i]));
-			if (cimag(v[i]) < 0)
-				putc('-', stdout);
-			else
-				putc('+', stdout);
-			printf("%gi", fabs(cimag(v[i])));
+			print_cmplx(v[i]);
 			if (i < nelem-1)
 				printf(", ");
 		}
