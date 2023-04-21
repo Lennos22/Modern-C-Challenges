@@ -8,7 +8,7 @@ TARGETS		:= sort_performance list_gen check_sorted
 all: $(TARGETS)
 
 ###############################################################################
-###								EXECUTABLES									###
+###                             EXECUTABLES                                 ###
 ###############################################################################
 
 sort_performance: sort_performance.o mergesort.o quicksort.o time_ops.o
@@ -18,7 +18,7 @@ list_gen: list_gen.o
 check_sorted: check_sorted.o
 
 ###############################################################################
-###								OBJECT FILES								###
+###                             OBJECT FILES                                ###
 ###############################################################################
 
 sort_performance.o: sort_performance.c mergesort.h quicksort.h time_ops.h
