@@ -14,20 +14,21 @@ OBJ_FILES	:= $(SRC_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 DEP_FILES	:= $(OBJ_FILES:.o=.d)
 
 # Shell strings
-STDC		:= -std=c11
+STDC		:= c11
+DGBC		:= -ggdb
 HARDMODE	:= -Wextra -Werror -pedantic-errors
-DEFINES		:= NDEBUG
+DEFINES		:= #NDEBUG
 DEF_FLAGS	:= $(addprefix -D,$(DEFINES))
 INC_FLAGS	:= $(addprefix -I,$(INC_DIRS))
 
-DEBUG		:= -Wall #$(HARDMODE)
+DEBUG		:= -Wall $(DGBC) $(HARDMODE)
 
 RM_R		= $(RM) -r
 DIR_GUARD	= @mkdir -p $(@D)
 
 # Makefile flags
 CC			:= gcc
-CFLAGS		:= $(STDC) $(DEBUG)
+CFLAGS		:= -std=$(STDC) $(DEBUG)
 CPPFLAGS	:= $(DEF_FLAGS) $(INC_FLAGS) -MMD -MP
 LDLIBS		:= -lm
 
