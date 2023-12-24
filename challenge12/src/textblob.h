@@ -97,6 +97,23 @@ TextBlob* textBlobCtor_n(TextBlob* const tbPtr, size_t const nChars, char const 
  */
 void textBlobDelete(TextBlob* const tbPtr);
 
+/**
+ * Splits TextBlob specified by @a tbSrc at index @a n.
+ *
+ * @a tbSrc will become the left-half of the original blob, while the right half will be allocated
+ * a new TextBlob object and linked after @a tbSrc.
+ *
+ * @param[in,out] tbSrc must be properly initialised.
+ * @param[in]     n     must be a non-zero integer that does not exceed the bounds of @a tbSrc.
+ *
+ * @warning Program will crash if value of @a n does not make any sense. E.g. @a n is set to
+ *          the null byte of the string of @a tbSrc.
+ *
+ * @return @a tbSrc if split was successful. NULL if at any point memory allocation fails, or if
+ *         @a tbSrc is NULL.
+ */
+TextBlob* textBlobSplit(TextBlob* const tbSrc, size_t const n);
+
 /*------------------*
  * Helper Functions *
  *------------------*/
@@ -104,6 +121,9 @@ char const* textBlobGetStr(const TextBlob* const tbPtr);
 size_t textBlobGetLen(const TextBlob* const tbPtr);
 TextBlob* textBlobGetPrev(const TextBlob* const tbPtr);
 TextBlob* textBlobGetNext(const TextBlob* const tbPtr);
+
+TextBlob* textBlobReplace(TextBlob* const tbPtr, char const newStr[static 1]);
+TextBlob* textBlobReplace_n(TextBlob* const tbPtr, size_t const nChars, char const newStr[nChars]);
 
 #endif /* TEXTBLOB_H_ */
 
