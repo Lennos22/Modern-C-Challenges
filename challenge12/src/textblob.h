@@ -98,6 +98,16 @@ TextBlob* textBlobCtor_n(TextBlob* const tbPtr, size_t const nChars, char const 
 void textBlobDelete(TextBlob* const tbPtr);
 
 /**
+ * Destructor for TextBlob objects.
+ *
+ * Not really necessary to include in API, since you may as well just use textBlobDelete(),
+ * instead. But, it is included on the rare occassion it is ever needed.
+ *
+ * @param[in] tbPtr must refer to a FULLY initialised TextBlob object. Otherwise, U.B. occurs.
+ */
+void textBlobDtor(TextBlob* const tbPtr);
+
+/**
  * Splits TextBlob specified by @a tbSrc at index @a n.
  *
  * @a tbSrc will become the left-half of the original blob, while the right half will be allocated
@@ -114,6 +124,24 @@ void textBlobDelete(TextBlob* const tbPtr);
  */
 TextBlob* textBlobSplit(TextBlob* const tbSrc, size_t const n);
 
+/**
+ * Merges two consecutive TextBlob objects.
+ *
+ * If operation was successful, the tail blob will be deleted via textBlobDelete(). Otherwise,
+ * It will be left as is, connected to @a tbFront.
+ *
+ * @warning Users should ALWAYS CHECK the result of the join operation. It will be their
+ *          responsibility to handle the error as per their program's requirements.
+ *
+ * @param[in,out] tbFront is the head of the two blobs. It must be connected to the tail blob.
+ *
+ * @return @a tbFront if join is successful. NULL if unsuccessful or @a tbFront is also NULL.
+ *
+ * @note Success also includes the case where @a tbFront is the last element in the list. In this
+ *       case, nothing happens.
+ */
+TextBlob* textBlobJoin(TextBlob* const tbFront);
+
 /*------------------*
  * Helper Functions *
  *------------------*/
@@ -124,6 +152,9 @@ TextBlob* textBlobGetNext(const TextBlob* const tbPtr);
 
 TextBlob* textBlobReplace(TextBlob* const tbPtr, char const newStr[static 1]);
 TextBlob* textBlobReplace_n(TextBlob* const tbPtr, size_t const nChars, char const newStr[nChars]);
+
+TextBlob* textBlobAppend(TextBlob* const tbPtr, char const newStr[static 1]);
+TextBlob* textBlobAppend_n(TextBlob* const tbPtr, size_t const nChars, char const newStr[nChars]);
 
 #endif /* TEXTBLOB_H_ */
 

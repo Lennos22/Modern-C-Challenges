@@ -85,10 +85,18 @@ TextBlob* textBlobCtor_n(TextBlob* const tbIn, size_t const nChars, char const s
 }
 
 void textBlobDelete(TextBlob* const tbPtr) {
+	textBlobDtor(tbPtr);
+	free(tbPtr);
+}
+
+void textBlobDtor(TextBlob* const tbPtr) {
 	if (!tbPtr) return;
 
-	if (tbPtr->str) free(tbPtr->str); // TODO: Consider making a destructor for TextBlob?
-	free(tbPtr);
+	if (tbPtr->str) free(tbPtr->str);
+	tbPtr->str = (void*) 0;
+	tbPtr->len = 0;
+	tbPtr->prev = (void*) 0;
+	tbPtr->next = (void*) 0;
 }
 
 TextBlob* textBlobSplit(TextBlob* const tbSrc, size_t const n) {
@@ -116,6 +124,24 @@ TextBlob* textBlobSplit(TextBlob* const tbSrc, size_t const n) {
 	return tbSrc;
 }
 
+TextBlob* textBlobJoin(TextBlob* const tbFront) {
+	if (!tbFront) return (void*) 0;
+
+	if (tbFront->next) {
+		TextBlob* const tbBack = tbFront->next;
+
+		if (!textBlobAppend(tbFront, tbBack->str)) return (void*) 0;
+
+		tbFront->next = tbBack->next;
+		if (tbFront->next)
+			tbFront->next->prev = tbFront;
+
+		textBlobDelete(tbBack);
+	}
+
+	return tbFront;
+}
+
 /*------------------*
  * Helper Functions *
  *------------------*/
@@ -136,9 +162,11 @@ TextBlob* textBlobGetNext(const TextBlob* const tbPtr) {
 }
 
 TextBlob* textBlobReplace(TextBlob* const tbPtr, char const newStr[static 1]) {
+	if (!tbPtr) return (void*) 0;
 	size_t const newLen = newStr ? getStrLen(newStr) : 0;
 
-	if (!(tbPtr->str = realloc(tbPtr->str, sizeof(char[newLen + 1])))) return (void*) 0;
+	if (tbPtr->len != newLen && !(tbPtr->str = realloc(tbPtr->str, sizeof(char[newLen + 1]))))
+		return (void*) 0;
 	strcpy(tbPtr->str, newStr);
 	tbPtr->len = newLen;
 
@@ -146,12 +174,44 @@ TextBlob* textBlobReplace(TextBlob* const tbPtr, char const newStr[static 1]) {
 }
 
 TextBlob* textBlobReplace_n(TextBlob* const tbPtr, size_t const nChars, char const newStr[nChars]) {
-	size_t const newLen = getStrLen_n(nChars, newStr);
+	if (!tbPtr) return (void*) 0;
+	size_t const newLen = newStr ? getStrLen_n(nChars, newStr) : 0;
 
-	if (!(tbPtr->str = realloc(tbPtr->str, sizeof(char[newLen + 1])))) return (void*) 0;
+	if (tbPtr->len != newLen && !(tbPtr->str = realloc(tbPtr->str, sizeof(char[newLen + 1]))))
+		return (void*) 0;
 	strncpy(tbPtr->str, newStr, newLen);
 	tbPtr->str[newLen] = '\0';
 	tbPtr->len = newLen;
+
+	return tbPtr;
+}
+
+TextBlob* textBlobAppend(TextBlob* const tbPtr, char const newStr[static 1]) {
+	if (!tbPtr) return (void*) 0;
+	size_t const newLen = tbPtr->len + (newStr ? getStrLen(newStr) : 0);
+
+	if (newLen > tbPtr->len) {
+		if (!(tbPtr->str = realloc(tbPtr->str, sizeof(char[newLen + 1]))))
+			return (void*) 0;
+		strcpy(tbPtr->str + tbPtr->len, newStr);
+		tbPtr->len = newLen;
+	}
+
+	return tbPtr;
+}
+
+TextBlob* textBlobAppend_n(TextBlob* const tbPtr, size_t const nChars, char const newStr[nChars]) {
+	if (!tbPtr) return (void*) 0;
+	size_t const endLen = newStr ? getStrLen_n(nChars, newStr) : 0;
+	size_t const newLen = tbPtr->len + endLen;
+
+	if (newLen > tbPtr->len) {
+		if (!(tbPtr->str = realloc(tbPtr->str, sizeof(char[newLen + 1]))))
+			return (void*) 0;
+		strncpy(tbPtr->str + tbPtr->len, newStr, endLen);
+		tbPtr->str[newLen] = '\0';
+		tbPtr->len = newLen;
+	}
 
 	return tbPtr;
 }
