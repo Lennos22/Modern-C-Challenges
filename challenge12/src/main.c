@@ -19,87 +19,71 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+enum {
+	MAX_BUF_LEN = 128,
+};
+
 int main(int argc, char* argv[argc + 1]) {
 	if (argc < 2) {
 		fprintf(stderr, "ERROR: expecting at least one argument...\n");
 		return EXIT_FAILURE;
 	}
-	if (argc == 2) {
-		TextBlob* tbInput = textBlobNew(argv[1]);
-		printf("Text input is: %s - len: %zu\n", textBlobGetStr(tbInput), textBlobGetLen(tbInput));
-	}
 	int errRet = EXIT_FAILURE;
 
+	static const char fMode[] = "r";
+	static char s_buf[MAX_BUF_LEN] = {0};
 	for (int i = 1; i < argc; ++i) {
-		TextBlob* tbInput = textBlobNew(argv[i]);
-		if (!tbInput) {
-			fprintf(stderr, "ERROR: could not initialise argument %d\n", i);
+		FILE* fp = fopen(argv[i], fMode);
+		if (!fp) {
+			fprintf(stderr, "ERROR: could not open file \"%s\"\n\n", argv[i]);
 			continue;
 		}
-		errRet = EXIT_SUCCESS; 
+		TextBlob* tbTxtFile = textBlobNew("");
+		if (!tbTxtFile) {
+			fprintf(stderr, "ERROR: TextBlob initialisation failed!\n");
+			goto CH12_CLEANUP_;
+		}
+		TextBlob* currTb = tbTxtFile;
 
-		char const* str = textBlobGetStr(tbInput);
-		size_t len = textBlobGetLen(tbInput);
-
-		printf("Argument %d is: \"%s\", length: %zu\n", i, str, len); 
-
-		printf("Splitting blob in half...\n");
-		textBlobSplit(tbInput, len/2);
-
-		str = textBlobGetStr(tbInput);
-		len = textBlobGetLen(tbInput);
-		printf("Front of blob is: \"%s\", length: %zu\n", str, len);
-
-		str = textBlobGetStr(textBlobGetNext(tbInput));
-		len = textBlobGetLen(textBlobGetNext(tbInput));
-		printf("Back of blob is: \"%s\", length: %zu\n", str, len);
-
-		char random[] = "chutzpah";
-		size_t const n = 4;
-		printf("Replacing blob with first %zu chars of \"%s\"...\n", n, random);
-		textBlobReplace_n(tbInput, n, random);
-
-		str = textBlobGetStr(tbInput);
-		len = textBlobGetLen(tbInput);
-		printf("Front of blob is now: \"%s\", length: %zu\n", str, len);
-
-		str = textBlobGetStr(textBlobGetNext(tbInput));
-		len = textBlobGetLen(textBlobGetNext(tbInput));
-		printf("Back of blob is still: \"%s\", length: %zu\n", str, len);
-
-		printf("Re-combining front and back...\n");
-		bool const res = textBlobJoin(tbInput);
-
-		if (!res) {
-			str = textBlobGetStr(tbInput);
-			len = textBlobGetLen(tbInput);
-			fprintf(stderr, "ERROR: Re-combination failed!\n"
-					"Front of blob is: \"%s\", length: %zu\n"
-					, str, len);
-
-			str = textBlobGetStr(textBlobGetNext(tbInput));
-			len = textBlobGetLen(textBlobGetNext(tbInput));
-			fprintf(stderr, "Back of blob is: \"%s\", length: %zu\n", str, len);
-			
-			textBlobDelete(textBlobGetNext(tbInput));
-		} else {
-			str = textBlobGetStr(tbInput);
-			len = textBlobGetLen(tbInput);
-			printf("Blob is now: \"%s\", length: %zu\n", str, len);
+		printf("Loading text from file \"%s\"...\n", argv[i]);
+		while (fgets(s_buf, sizeof s_buf, fp)) {
+			if (!textBlobAppend(tbTxtFile, s_buf)) {
+				fprintf(stderr, "ERROR: TextBlob append failed!\n");
+				goto CH12_CLEANUP_;
+			}
 		}
 
-		char rnd2[] = "gesundheit";
-		size_t const n2 = 7;
-		printf("Appending first %zu chars of \"%s\" into blob...\n", n2, rnd2);
-		textBlobAppend_n(tbInput, n2, rnd2);
+		printf("Separating TextBlob by newline...\n");
+		if (!textBlobSeparateBy(tbTxtFile, '\n')) {
+			fprintf(stderr, "ERROR: TextBlob separation failed!\n");
+			goto CH12_CLEANUP_;
+		}
 
-		str = textBlobGetStr(tbInput);
-		len = textBlobGetLen(tbInput);
-		printf("Blob is now: \"%s\", length: %zu\n", str, len);
+		size_t numLines = 0;
 
+		while (currTb) {
+			++numLines;
+			printf("|%3zu,%3zu|%s", numLines, textBlobGetLen(currTb) - 1, textBlobGetStr(currTb));
+			currTb = textBlobGetNext(currTb);
+		}
+
+		printf("There are %zu lines in file \"%s\"\n"
+				"Finished processing file \"%s\"\n"
+				, numLines, argv[i], argv[i]);
+
+		errRet = EXIT_SUCCESS;
+
+CH12_CLEANUP_: // An expedient solution.
 		putc('\n', stdout);
-		
-		textBlobDelete(tbInput);
+		currTb = tbTxtFile;
+		TextBlob* nextTb = textBlobGetNext(currTb);
+		textBlobDelete(currTb);
+		while (nextTb) {
+			currTb = nextTb;
+			nextTb = textBlobGetNext(currTb);
+			textBlobDelete(currTb);
+		}
+		fclose(fp);
 	}
 
 	if (errRet == EXIT_FAILURE)

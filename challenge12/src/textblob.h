@@ -13,6 +13,7 @@
  * C StdLib Includes *
  *-------------------*/
 #include <stddef.h>
+#include <stdbool.h>
 
 /*-----------------*
  * Public Typedefs *
@@ -71,8 +72,8 @@ TextBlob* textBlobCtor(TextBlob* const tbPtr, char const str[static 1]);
  * before @a nChars, the true length will be reflected, accordingly. Therefore, do not expect @a
  * nChars to be the final length of %a tbPtr.
  *
- * @param[in, out] tbPtr  should be uninitialised. Otherwise, you will have problems with memory
- *                        management.
+ * @param[in,out] tbPtr  should be uninitialised. Otherwise, you will have problems with memory
+ *                       management.
  * @param[in]      nChars is the upper limit of TextBlob string.
  * @param[in]      str    is null-terminated and/or at least @a nChars long.
  * @see            textBlobDelete().
@@ -141,6 +142,23 @@ TextBlob* textBlobSplit(TextBlob* const tbSrc, size_t const n);
  *       case, nothing happens.
  */
 TextBlob* textBlobJoin(TextBlob* const tbFront);
+
+/**
+ * Separates TextBlob object, @a tbSrc, by specified character separator, @a separator.
+ *
+ * Will find ALL locations of @a separator and separate from RIGHT side of blob. The separated
+ * blobs will be joined together contiguously in the original order of @a tbSrc.
+ *
+ * @param[in,out] tbSrc     must be properly initialised.
+ * @param[in]     separator is a single, 8-bit ASCII char.
+ *
+ * @return TRUE if separation was successful. FALSE if AT LEAST ONE separator fails to separate or
+ * @a tbSrc is NULL.
+ *
+ * @note Function will still attempt to separate as many times as possible even if FALSE is
+ *       returned. Therefore, it will be up to the user to check and handle the error, accordingly.
+ */
+bool textBlobSeparateBy(TextBlob* const tbSrc, char const separator);
 
 /*------------------*
  * Helper Functions *

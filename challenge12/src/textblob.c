@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #include <assert.h>
 
@@ -56,32 +57,34 @@ TextBlob* textBlobNew_n(size_t const nChars, char const str[nChars]) {
 }
 
 TextBlob* textBlobCtor(TextBlob* const tbIn, char const str[static 1]) {
-		size_t const len = getStrLen(str);
+	assert(tbIn && str);
+	size_t const len = getStrLen(str);
 
-		tbIn->str = malloc(sizeof(char[len + 1]));
-		if (!tbIn->str) return (void*) 0;
+	tbIn->str = malloc(sizeof(char[len + 1]));
+	if (!tbIn->str) return (void*) 0;
 
-		strcpy(tbIn->str, str); // We checked the bounds of `str` so `strcpy()` should be safe.
-		tbIn->len = len;
-		tbIn->prev = (void*) 0;
-		tbIn->next = (void*) 0;
+	strcpy(tbIn->str, str); // We checked the bounds of `str` so `strcpy()` should be safe.
+	tbIn->len = len;
+	tbIn->prev = (void*) 0;
+	tbIn->next = (void*) 0;
 
-		return tbIn;
+	return tbIn;
 }
 
 TextBlob* textBlobCtor_n(TextBlob* const tbIn, size_t const nChars, char const str[nChars]) {
-		size_t const len = getStrLen_n(nChars, str);
+	assert(tbIn && str);
+	size_t const len = getStrLen_n(nChars, str);
 
-		tbIn->str = malloc(sizeof(char[len + 1]));
-		if (!tbIn->str) return (void*) 0;
+	tbIn->str = malloc(sizeof(char[len + 1]));
+	if (!tbIn->str) return (void*) 0;
 
-		strncpy(tbIn->str, str, len);
-		tbIn->str[len] = '\0';
-		tbIn->len = len;
-		tbIn->prev = (void*) 0;
-		tbIn->next = (void*) 0;
+	if (nChars) strncpy(tbIn->str, str, len);
+	tbIn->str[len] = '\0';
+	tbIn->len = len;
+	tbIn->prev = (void*) 0;
+	tbIn->next = (void*) 0;
 
-		return tbIn;
+	return tbIn;
 }
 
 void textBlobDelete(TextBlob* const tbPtr) {
@@ -142,6 +145,18 @@ TextBlob* textBlobJoin(TextBlob* const tbFront) {
 	return tbFront;
 }
 
+bool textBlobSeparateBy(TextBlob* const tbSrc, char const separator) {
+	if (!tbSrc) return false;
+	bool res = true;
+
+	for (size_t i = tbSrc->len - 2; i < tbSrc->len - 1; --i) {
+		if (tbSrc->str[i] == separator && !textBlobSplit(tbSrc, i + 1))
+			res = false;
+	}
+
+	return res;
+}
+
 /*------------------*
  * Helper Functions *
  *------------------*/
@@ -154,11 +169,11 @@ size_t textBlobGetLen(const TextBlob* const tbPtr) {
 }
 
 TextBlob* textBlobGetPrev(const TextBlob* const tbPtr) {
-	return tbPtr ? tbPtr->prev : (void*) 0;
+	return tbPtr->prev;
 }
 
 TextBlob* textBlobGetNext(const TextBlob* const tbPtr) {
-	return tbPtr ? tbPtr->next : (void*) 0;
+	return tbPtr->next;
 }
 
 TextBlob* textBlobReplace(TextBlob* const tbPtr, char const newStr[static 1]) {
