@@ -72,7 +72,7 @@ TextBlob* textBlobCtor(TextBlob* const tbIn, char const str[static 1]) {
 }
 
 TextBlob* textBlobCtor_n(TextBlob* const tbIn, size_t const nChars, char const str[nChars]) {
-	assert(tbIn && str);
+	assert(tbIn && (str || !nChars) /* Either str is non-NULL, or nChars is 0 */);
 	size_t const len = getStrLen_n(nChars, str);
 
 	tbIn->str = malloc(sizeof(char[len + 1]));
@@ -95,7 +95,7 @@ void textBlobDelete(TextBlob* const tbPtr) {
 void textBlobDtor(TextBlob* const tbPtr) {
 	if (!tbPtr) return;
 
-	if (tbPtr->str) free(tbPtr->str);
+	free(tbPtr->str);
 	tbPtr->str = (void*) 0;
 	tbPtr->len = 0;
 	tbPtr->prev = (void*) 0;
@@ -109,16 +109,11 @@ TextBlob* textBlobSplit(TextBlob* const tbSrc, size_t const n) {
 	TextBlob* tbBack = textBlobNew(tbSrc->str + n);
 	if (!tbBack) return (void*) 0;
 
-	char* const s_tmp = malloc(sizeof(char[n + 1]));
-	if (!s_tmp) return (void*) 0;
-	strncpy(s_tmp, tbSrc->str, n);
-	s_tmp[n] = '\0';
-
-	if (!textBlobReplace(tbSrc, s_tmp)) return (void*) 0;
+	if (!(tbSrc->str = realloc(tbSrc->str, sizeof(char[n + 1]))))
+		return (void*) 0;
+	tbSrc->str[n] = '\0';
 	tbSrc->len = n;
 
-	free(s_tmp);
-	
 	tbBack->prev = tbSrc;
 	if (tbSrc->next) tbSrc->next->prev = tbBack;
 	tbBack->next = tbSrc->next;
@@ -169,11 +164,11 @@ size_t textBlobGetLen(const TextBlob* const tbPtr) {
 }
 
 TextBlob* textBlobGetPrev(const TextBlob* const tbPtr) {
-	return tbPtr->prev;
+	return tbPtr ? tbPtr->prev : (void*) 0;
 }
 
 TextBlob* textBlobGetNext(const TextBlob* const tbPtr) {
-	return tbPtr->next;
+	return tbPtr? tbPtr->next : (void*) 0;
 }
 
 TextBlob* textBlobReplace(TextBlob* const tbPtr, char const newStr[static 1]) {
