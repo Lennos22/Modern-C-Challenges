@@ -1,26 +1,47 @@
 /**
-  * @file main.c
-  *
-  * Created by Nelson Cardona
-  * Creation Date/Time: 23-12-23/17:45
-  *
-  * Tests for TextBlob API.
-  *
-  * There are many Stack Overflow posts about retrieving window size in C, but this one has
-  * solutions for both Linux and Windows:
-  *     https://stackoverflow.com/questions/23369503/get-size-of-terminal-window-rows-columns
-  * 
-  * For now, we limit ourselves to Linux platforms.
-  */
+ * @file main.c
+ *
+ * Tests for TextBlob API.
+ *
+ * There are many Stack Overflow posts about retrieving window size in C, but this one has
+ * solutions for both Linux and Windows:
+ *     https://stackoverflow.com/questions/23369503/get-size-of-terminal-window-rows-columns
+ * 
+ * For now, we limit ourselves to Linux platforms. [This Stack Overflow post][SO OS Check]
+ * gives an overview of the macros you can check to determine which OS you're compiling in.
+ * A full list of macros for most if not all OS'es can be found [here][Predefined Macros].
+ *
+ * Created by Nelson Cardona
+ * Creation Date/Time: 23-12-23/17:45
+ *
+ * [SO OS Check]: https://stackoverflow.com/questions/142508/how-do-i-check-os-with-a-preprocessor-directive
+ *     "How do I check OS with a preprocessor directive?"
+ * [Predefined Macros]: https://sourceforge.net/p/predef/wiki/OperatingSystems/
+ *     "Pre-defined Compiler Macros Wiki"
+ */
+
+#if defined (__linux__)
+# define PREDEF_LINUX_PLATFORM
+#endif
+
+#if defined (__APPLE__) || defined (__MACH__)
+# define PREDEF_MAC_OS_PLATFORM
+#endif
+
+/* UNIX and BSD OS'es may also contain GNU libc. Will need to confirm...*/
+
+#if !defined (PREDEF_LINUX_PLATFORM) && !defined (PREDEF_MAC_OS_PLATFORM_)
+# error "Current platform does not support GNU libc..."
+#endif
 
 /*------------------*
  * Project Includes *
  *------------------*/
 #include "textblob.h"
 
-/*-----------*
- * POSIX API *
- *-----------*/ 
+/*-----------------------*
+ * GNU libc API Includes *
+ *-----------------------*/ 
 #include <sys/ioctl.h>
 #include <unistd.h>
 
