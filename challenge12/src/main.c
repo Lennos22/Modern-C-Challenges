@@ -79,16 +79,19 @@ enum {
 size_t printBlobList(TextBlob* const head, bool hasLSwitch, bool hasWinsize);
 void printStartBanner(struct winsize const* const w);
 void printEndBanner(struct winsize const* const w);
+void printHelp();
 
 int main(int argc, char* argv[argc + 1]) {
 	static char const lSwitch[] = "-l";
 	static char const winsizeSwitch[] = "--winsize";
 	static char const wsSwitch[] = "-ws";
+	static char const helpSwitch[] = "--help";
 
 	int errRet = EXIT_FAILURE;
 	size_t fargs = 0;
 	int lSwitchIdx = 0;
 	int winsizeIdx = 0;
+	int helpIdx = 0;
 
 	/*--- Find Switches ---*/
 	for (int i = 1; i < argc; ++i) {
@@ -104,21 +107,22 @@ int main(int argc, char* argv[argc + 1]) {
 					"columns = %hu\n"
 					, winsizeSwitch, i, w.ws_row, w.ws_col);
 			winsizeIdx = i;
-		} else ++fargs;
+		} else if (!helpIdx && !strcmp(argv[i], helpSwitch)) helpIdx = i;
+		else ++fargs;
 	}
 	if (lSwitchIdx || winsizeIdx) putc('\n', stdout);
 
 	/*--- Check Valid Args ---*/
-	if (!fargs) {
-		fprintf(stderr, "ERROR: expecting at least one argument...\n");
-		return EXIT_FAILURE;
+	if (!fargs || helpIdx) {
+		printHelp();
+		return EXIT_SUCCESS;
 	}
 
 	/*--- Process Args ---*/
 	static const char fMode[] = "r";
 	static char s_buf[MAX_BUF_LEN] = {0};
 	for (int i = 1; i < argc; ++i) {
-		if (i == lSwitchIdx || i == winsizeIdx) continue;
+		if (i == lSwitchIdx || i == winsizeIdx || i == helpIdx) continue;
 		FILE* fp = fopen(argv[i], fMode);
 		if (!fp) {
 			fprintf(stderr, "ERROR: could not open file \"%s\"\n\n", argv[i]);
@@ -268,5 +272,21 @@ void printEndBanner(struct winsize const* const w) {
 	bannerEnd[w->ws_col] = '\0';
 
 	puts(bannerEnd);
+}
+
+void printHelp() {
+	printf("Usage: textprocessor [OPTIONS]... [FILE]...\n"
+			"This text processor prints text from a given file(s) line by line.\n"
+			"Options can be put in any order. E.g. './textprocessor Makefile -l' works\n"
+			"as well as './textprocessor -l Makefile'.\n"
+			"Specifying an option muliple times will treat subsequent duplicates as file args.\n"
+			"\n"
+			"Options:\n"
+			"\t-l             verbose output: include line no. + no. of chars on each line\n"
+			"\t-ws, --winsize limit amount of text printed to current size of output window\n"
+			"\t     --help    get help text\n"
+			"\n"
+			"Very limited program that is only verified to work in Linux and Mac terminal\n"
+			"environments. I tried my best...\n");
 }
 
